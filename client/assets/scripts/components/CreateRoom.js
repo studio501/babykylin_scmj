@@ -110,7 +110,8 @@ cc.Class({
         else if (type == 'xlch') {
             conf = this.constructSCMJConf();
         }
-        conf.type = type;
+        // conf.type = type;
+        conf.type = "chess";
 
         var data = {
             account: cc.vv.userMgr.account,

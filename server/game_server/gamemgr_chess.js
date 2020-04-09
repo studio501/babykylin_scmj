@@ -1,6 +1,7 @@
 var roomMgr = require("./roommgr");
 var userMgr = require("./usermgr");
 var mjutils = require('./mjutils');
+var chessutils = require('./chessutils');
 var db = require("../utils/db");
 var crypto = require("../utils/crypto");
 var games = {};
@@ -19,6 +20,18 @@ var gameSeatsOfUsers = {};
 const GameSeatNum = 2;
 const RowNum = 10;
 const ColNum = 9;
+const StartBoardArray = [
+    1,2,3,4,5,6,7,8,9,
+    0,0,0,0,0,0,0,0,0,
+    0,10,0,0,0,0,0,11,0,
+    12,0,13,0,14,0,15,0,16,
+    0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,
+    17,0,18,0,19,0,20,0,21,
+    0,22,0,0,0,0,0,23,0,
+    0,0,0,0,0,0,0,0,0,
+    24,25,26,27,28,29,30,31,32
+];
 
 const Blank = 0;
 const Che = 1;
@@ -1222,6 +1235,10 @@ exports.begin = function(roomId) {
 
     roomInfo.numOfGames++;
 
+    for(var i=0;i<StartBoardArray.length;i++){
+        game.chessArray[i] = StartBoardArray[i];
+    }
+
     for(var i = 0; i < GameSeatNum; ++i){
         var data = game.gameSeats[i] = {};
 
@@ -2262,7 +2279,22 @@ exports.dissolveAgree = function(roomId,userId,agree){
 
 //象棋逻辑
 exports.move = function(userId,start_p,end_p){
+    var game = getGameByUserID(userId);
+    if(!game){
+        return;
+    }
 
+    var chessArray = game.chessArray;
+    if(!chessArray){
+        return;
+    }
+
+    var startIndex = chessutils.hanglie2index(start_p.hang,start_p.lie);
+    var endIndex = chessutils.hanglie2index(end_p.hang,end_p.lie);
+    chessArray[endIndex] = chessArray[startIndex];
+    chessArray[startIndex] = 0;
+
+    userMgr.broacastInRoom('chess_move',{chessArray:chessArray},userId,true);
 }
 
 

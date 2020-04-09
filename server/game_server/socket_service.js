@@ -163,6 +163,9 @@ exports.start = function(conf,mgr){
 
 			var start_p = data.start;
 			var end_p = data.end;
+			if(!start_p || !end_p){
+				return;
+			}
 			socket.gameMgr.move(socket.userId,start_p,end_p);
 		})
 

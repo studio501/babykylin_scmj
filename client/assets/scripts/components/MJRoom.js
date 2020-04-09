@@ -68,7 +68,7 @@ cc.Class({
         
         if(cc.vv.gameNetMgr.conf){
             var type = cc.vv.gameNetMgr.conf.type;
-            if(type == null || type == ""){
+            if(type == null || type == "" || type == "chess"){
                 type = "xzdd";
             }
             
