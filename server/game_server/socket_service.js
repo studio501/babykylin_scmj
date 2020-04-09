@@ -149,6 +149,25 @@ exports.start = function(conf,mgr){
 			userMgr.broacastInRoom('user_ready_push',{userid:userId,ready:true},userId,true);
 		});
 
+		//象棋逻辑
+		socket.on('zouzi',function(data){
+			if(socket.userId == null){
+				return;
+			}
+			if(data == null){
+				return;
+			}
+			if(typeof(data) == "string"){
+				data = JSON.parse(data);
+			}
+
+			var start_p = data.start;
+			var end_p = data.end;
+			socket.gameMgr.move(socket.userId,start_p,end_p);
+		})
+
+		//象棋逻辑 end
+
 		//换牌
 		socket.on('huanpai',function(data){
 			if(socket.userId == null){

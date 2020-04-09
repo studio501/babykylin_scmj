@@ -34,12 +34,16 @@ function constructRoomFromDb(dbdata){
 	if(roomInfo.conf.type == "xlch"){
 		roomInfo.gameMgr = require("./gamemgr_xlch");
 	}
-	else{
+	else if(roomInfo.conf.type == "xzdd"){
 		roomInfo.gameMgr = require("./gamemgr_xzdd");
 	}
+	else if(roomInfo.conf.type == "chess"){
+		roomInfo.gameMgr = require("./gamemgr_chess");
+	}
 	var roomId = roomInfo.id;
+	var seat_num = roomInfo.conf.type == "chess" ? 2 : 4;
 
-	for(var i = 0; i < 4; ++i){
+	for(var i = 0; i < seat_num; ++i){
 		var s = roomInfo.seats[i] = {};
 		s.userId = dbdata["user_id" + i];
 		s.score = dbdata["user_score" + i];
@@ -147,12 +151,15 @@ exports.createRoom = function(creator,roomConf,gems,ip,port,callback){
 					if(roomConf.type == "xlch"){
 						roomInfo.gameMgr = require("./gamemgr_xlch");
 					}
-					else{
+					else if (roomInfo.conf.type == "xzdd"){
 						roomInfo.gameMgr = require("./gamemgr_xzdd");
 					}
+					else if(roomInfo.conf.type == "chess"){
+						roomInfo.gameMgr = require("./gamemgr_chess");
+					}
 					console.log(roomInfo.conf);
-					
-					for(var i = 0; i < 4; ++i){
+					var seat_num = roomInfo.conf.type == "chess" ? 2 : 4;
+					for(var i = 0; i < seat_num; ++i){
 						roomInfo.seats.push({
 							userId:0,
 							score:0,
