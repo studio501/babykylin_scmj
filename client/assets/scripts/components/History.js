@@ -69,6 +69,9 @@ cc.Class({
         this._history.active = true;
         var self = this;
         cc.vv.userMgr.getHistoryList(function(data){
+            if(!data){
+                return;
+            }
             data.sort(function(a,b){
                 return a.time < b.time; 
             });
