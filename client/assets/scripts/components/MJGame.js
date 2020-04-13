@@ -429,6 +429,10 @@ cc.Class({
             self.prepareRoot.active = true;
             console.log('login_result');
         });
+
+        this.node.on('chess_move',function(data){
+            let a = 100;
+        });
     },
     
     showChupai:function(){

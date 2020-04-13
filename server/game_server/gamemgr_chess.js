@@ -13,6 +13,7 @@ var ACTION_PENG = 3;
 var ACTION_GANG = 4;
 var ACTION_HU = 5;
 var ACTION_ZIMO = 6;
+var ACTION_ZOUZI = 7;
 
 var gameSeatsOfUsers = {};
 
@@ -1312,10 +1313,10 @@ exports.begin = function(roomId) {
         gameSeatsOfUsers[data.userId] = data;
     }
     games[roomId] = game;
-    //洗牌
-    shuffle(game);
-    //发牌
-    deal(game);
+    // //洗牌
+    // shuffle(game);
+    // //发牌
+    // deal(game);
 
     
 
@@ -1326,24 +1327,24 @@ exports.begin = function(roomId) {
         //开局时，通知前端必要的数据
         var s = seats[i];
         //通知玩家手牌
-        userMgr.sendMsg(s.userId,'game_holds_push',game.gameSeats[i].holds);
+        // userMgr.sendMsg(s.userId,'game_holds_push',game.gameSeats[i].holds);
         //通知还剩多少张牌
-        userMgr.sendMsg(s.userId,'mj_count_push',numOfMJ);
+        // userMgr.sendMsg(s.userId,'mj_count_push',numOfMJ);
         //通知还剩多少局
-        userMgr.sendMsg(s.userId,'game_num_push',roomInfo.numOfGames);
+        // userMgr.sendMsg(s.userId,'game_num_push',roomInfo.numOfGames);
         //通知游戏开始
         userMgr.sendMsg(s.userId,'game_begin_push',game.button);
 
-        if(huansanzhang == true){
-            game.state = "huanpai";
-            //通知准备换牌
-            userMgr.sendMsg(s.userId,'game_huanpai_push');
-        }
-        else{
-            game.state = "dingque";
-            //通知准备定缺
-            userMgr.sendMsg(s.userId,'game_dingque_push');
-        }
+        // if(huansanzhang == true){
+        //     game.state = "huanpai";
+        //     //通知准备换牌
+        //     userMgr.sendMsg(s.userId,'game_huanpai_push');
+        // }
+        // else{
+        //     game.state = "dingque";
+        //     //通知准备定缺
+        //     userMgr.sendMsg(s.userId,'game_dingque_push');
+        // }
     }
 };
 
@@ -2296,9 +2297,6 @@ exports.move = function(userId,start_p,end_p){
 
     userMgr.broacastInRoom('chess_move',{chessArray:chessArray},userId,true);
 }
-
-
-
 
 function update() {
     for(var i = dissolvingList.length - 1; i >= 0; --i){

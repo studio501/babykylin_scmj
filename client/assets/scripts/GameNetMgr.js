@@ -165,7 +165,7 @@ cc.Class({
     initHandlers:function(){
         var self = this;
         cc.vv.net.addHandler("login_result",function(data){
-            console.log(data);
+            console.log("login_result",data);
             if(data.errcode === 0){
                 var data = data.data;
                 self.roomId = data.roomid;
@@ -184,7 +184,9 @@ cc.Class({
                 
         cc.vv.net.addHandler("login_finished",function(data){
             console.log("login_finished");
-            cc.director.loadScene("mjgame",function(){
+            let scene_name = self.conf.type === "chess" ? 'chessgame' : 'mjgame'
+            cc.view.setOrientation(cc.macro.ORIENTATION_PORTRAIT)
+            cc.director.loadScene(scene_name,function(){
                 cc.vv.net.ping();
                 cc.vv.wc.hide();
             });
@@ -329,7 +331,7 @@ cc.Class({
             self.button = data.button;
             self.chupai = data.chuPai;
             self.huanpaimethod = data.huanpaimethod;
-            for(var i = 0; i < 4; ++i){
+            for(var i = 0; i < self.seats.length; ++i){
                 var seat = self.seats[i];
                 var sd = data.seats[i];
                 seat.holds = sd.holds;
@@ -364,6 +366,10 @@ cc.Class({
         
         cc.vv.net.addHandler("hangang_notify_push",function(data){
             self.dispatchEvent('hangang_notify',data);
+        });
+
+        cc.vv.net.addHandler("chess_move",function(data){
+            self.dispatchEvent('chess_move',data);
         });
         
         cc.vv.net.addHandler("game_action_push",function(data){
