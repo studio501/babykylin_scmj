@@ -134,7 +134,6 @@ CREATE TABLE `t_rooms` (
 -- ----------------------------
 -- Records of t_rooms
 -- ----------------------------
-INSERT INTO `t_rooms` VALUES ('1490875578938526035', '526035', '{\"type\":\"xzdd\",\"baseScore\":1,\"zimo\":0,\"jiangdui\":false,\"hsz\":false,\"dianganghua\":0,\"menqing\":false,\"tiandihu\":false,\"maxFan\":4,\"maxGames\":4,\"creator\":9}', '1490875579', '0', '0', '9', '', '5aSP5L6v6LWM5L6g', '0', '10', '', '55qH55Sr56iz6LWi', '0', '11', '', '5Lic5pa56ZuA5Zyj', '0', '12', '', '5qyn6Ziz6Ieq5pG4', '0', '127.0.0.1', '10000');
 
 -- ----------------------------
 -- Table structure for `t_users`
@@ -152,6 +151,7 @@ CREATE TABLE `t_users` (
   `gems` int(11) DEFAULT '0' COMMENT '用户宝石',
   `roomid` varchar(8) DEFAULT NULL,
   `history` varchar(4096) NOT NULL DEFAULT '',
+  `bindhero` char(20) NOT NULL DEFAULT '',
   PRIMARY KEY (`userid`),
   UNIQUE KEY `account` (`account`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
@@ -159,7 +159,29 @@ CREATE TABLE `t_users` (
 -- ----------------------------
 -- Records of t_users
 -- ----------------------------
-INSERT INTO `t_users` VALUES ('9', 'guest_123456', '5aSP5L6v6LWM5L6g', '0', null, '1', '0', '1000', '21', '526035', '');
-INSERT INTO `t_users` VALUES ('10', 'guest_asdf1', '55qH55Sr56iz6LWi', '0', null, '1', '0', '1000', '21', '526035', '');
-INSERT INTO `t_users` VALUES ('11', 'guest_asdf2', '5Lic5pa56ZuA5Zyj', '0', null, '1', '0', '1000', '21', '526035', '');
-INSERT INTO `t_users` VALUES ('12', 'guest_asdf3', '5qyn6Ziz6Ieq5pG4', '0', null, '1', '0', '1000', '21', '526035', '');
+INSERT INTO `t_users` VALUES ('9', 'guest_123456', '5aSP5L6v6LWM5L6g', '0', null, '1', '0', '1000', '21', '526035', '', '1');
+INSERT INTO `t_users` VALUES ('10', 'guest_asdf1', '55qH55Sr56iz6LWi', '0', null, '1', '0', '1000', '21', '526035', '', '2');
+
+
+-- ----------------------------
+-- Table structure for `t_heros`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_heros`;
+CREATE TABLE `t_heros` (
+  `id` char(20) NOT NULL COMMENT '英雄ID',
+  `uuid` char(20) NOT NULL COMMENT '英雄UUID',
+  `name` varchar(32) DEFAULT NULL COMMENT '名字',
+  `hp` int(11) DEFAULT '0' COMMENT '血量',
+  `mp` int(11) DEFAULT '0' COMMENT '蓝量',
+  `atk` int(11) DEFAULT '0' COMMENT '攻击',
+  `def` int(11) DEFAULT '0' COMMENT '物防',
+  `lv` smallint(6) DEFAULT '1' COMMENT '等级',
+  `exp` int(11) DEFAULT '0' COMMENT '用户经验',
+  `sk1` char(20) DEFAULT NULL COMMENT '技能1',
+  `sk1exp` int(11) DEFAULT '0' COMMENT '技能1熟练度',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uuid` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `t_heros` VALUES ('1', 'asdnf12', '张飞', '100', '100', '20', '10', '1', '0', '1221', '0');
+INSERT INTO `t_heros` VALUES ('2', '345znfa', '关羽', '110', '100', '20', '10', '1', '0', '3121', '0');

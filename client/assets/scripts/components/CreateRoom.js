@@ -111,7 +111,7 @@ cc.Class({
             conf = this.constructSCMJConf();
         }
         conf.type = type;
-        // conf.type = "chess";
+        conf.type = "chess";
 
         var data = {
             account: cc.vv.userMgr.account,
