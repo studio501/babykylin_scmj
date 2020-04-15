@@ -176,7 +176,7 @@ exports.get_user_data_by_userid = function(userid,callback){
         return;
     }
 
-    var sql = 'SELECT userid,account,name,lv,exp,coins,gems,roomid FROM t_users WHERE userid = ' + userid;
+    var sql = 'SELECT userid,account,name,lv,exp,coins,gems,roomid,bindhero FROM t_users WHERE userid = ' + userid;
     query(sql, function(err, rows, fields) {
         if (err) {
             callback(null);
@@ -599,6 +599,31 @@ exports.get_room_data = function(roomId,callback){
             rows[0].user_name1 = crypto.fromBase64(rows[0].user_name1);
             rows[0].user_name2 = crypto.fromBase64(rows[0].user_name2);
             rows[0].user_name3 = crypto.fromBase64(rows[0].user_name3);
+            callback(rows[0]);
+        }
+        else{
+            callback(null);
+        }
+    });
+};
+
+exports.get_hero_data = function(heroId,id_key,callback){
+    callback = callback == null? nop:callback;
+    if(heroId == null){
+        callback(null);
+        return;
+    }
+
+    id_key = id_key || "id";
+
+    var sql = `SELECT * FROM t_heros WHERE ${id_key} = "` + heroId + '"';
+    query(sql, function(err, rows, fields) {
+        if(err){
+            callback(null);
+            throw err;
+        }
+        if(rows.length > 0){
+            rows[0].name = crypto.fromBase64(rows[0].name);
             callback(rows[0]);
         }
         else{

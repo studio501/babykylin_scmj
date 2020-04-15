@@ -48,8 +48,16 @@ cc.Class({
             cc.vv.utils.addClickEvent(btnWechat,this.node,"ChessGame","zouzi_test");
         }
 
-        
+        this.test_hero();
     },
+    test_hero(){
+        let self = this;
+        cc.loader.loadRes('sg/prefabs/hero',cc.Prefab,function(error,res){
+            let hero = cc.instantiate(res);
+            hero.parent = self.node.getChildByName("heroroot")
+        })
+    },
+
     zouzi_test(){
         let data = {
             start:{hang:0,lie:0},
@@ -255,6 +263,14 @@ cc.Class({
         this.node.on('chess_move',function(data){
             self.refreshBoard(data)
         });
+
+        this.node.on('push_hero_data',function(data){
+            self.onHeroDataResp(data)
+        });
+    },
+
+    onHeroDataResp(data){
+        let a = data;
     },
 
     onGameBeign:function(){

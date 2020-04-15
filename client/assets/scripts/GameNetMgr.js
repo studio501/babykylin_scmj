@@ -358,6 +358,10 @@ cc.Class({
             self.gamestate = 'dingque';
             self.dispatchEvent('game_dingque');
         });
+
+        cc.vv.net.addHandler("push_hero_data",function(data){
+            self.dispatchEvent('push_hero_data',data);
+        });
         
         cc.vv.net.addHandler("game_huanpai_push",function(data){
             self.isHuanSanZhang = true;

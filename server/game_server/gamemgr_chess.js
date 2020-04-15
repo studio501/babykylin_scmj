@@ -1089,6 +1089,8 @@ exports.setReady = function(userId,callback){
 
     roomMgr.setReady(userId,true);
 
+    replyHero(userId);
+
     var game = games[roomId];
     if(game == null){
         if(roomInfo.seats.length == GameSeatNum){
@@ -1204,6 +1206,19 @@ function store_game(game,callback){
     db.create_game(game.roomInfo.uuid,game.gameIndex,game.baseInfoJson,callback);
 }
 
+function replyHero(userId){
+    db.get_user_data_by_userid(userId,function(res){
+        if(!res){
+            return;
+        }
+        if(res.bindhero){
+            db.get_hero_data(res.bindhero,null,function(herodata){
+                userMgr.sendMsg(userId,'push_hero_data',herodata);
+            })
+        }
+    })
+}
+
 //开始新的一局
 exports.begin = function(roomId) {
     var roomInfo = roomMgr.getRoom(roomId);
@@ -1217,22 +1232,9 @@ exports.begin = function(roomId) {
         roomInfo:roomInfo,
         gameIndex:roomInfo.numOfGames,
 
-        // button:roomInfo.nextButton,
-        // mahjongs:new Array(108),
         currentIndex:0,
         gameSeats:new Array(GameSeatNum),
         chessArray: new Array(RowNum*ColNum),
-
-        // numOfQue:0,
-        // turn:0,
-        // chuPai:-1,
-        // state:"idle",
-        // firstHupai:-1,
-        // yipaoduoxiang:-1,
-        // fangpaoshumu:-1,
-        // actionList:[],
-        // hupaiList:[],
-        // chupaiCnt:0,
     };
 
     roomInfo.numOfGames++;
@@ -1250,73 +1252,9 @@ exports.begin = function(roomId) {
 
         data.userId = seats[i].userId;
 
-        // //持有的牌
-        // data.holds = [];
-        // //打出的牌
-        // data.folds = [];
-        // //暗杠的牌
-        // data.angangs = [];
-        // //点杠的牌
-        // data.diangangs = [];
-        // //弯杠的牌
-        // data.wangangs = [];
-        // //碰了的牌
-        // data.pengs = [];
-        // //缺一门
-        // data.que = -1;
-
-        // //换三张的牌
-        // data.huanpais = null;
-
-        // //玩家手上的牌的数目，用于快速判定碰杠
-        // data.countMap = {};
-        // //玩家听牌，用于快速判定胡了的番数
-        // data.tingMap = {};
-        // data.pattern = "";
-
-        // //是否可以杠
-        // data.canGang = false;
-        // //用于记录玩家可以杠的牌
-        // data.gangPai = [];
-
-        // //是否可以碰
-        // data.canPeng = false;
-        // //是否可以胡
-        // data.canHu = false;
-        // //是否可以出牌
-        // data.canChuPai = false;
-
-        // //如果guoHuFan >=0 表示处于过胡状态，
-        // //如果过胡状态，那么只能胡大于过胡番数的牌
-        // data.guoHuFan = -1;
-
-        // //是否胡了
-        // data.hued = false;
-        // //是否是自摸
-        // data.iszimo = false;
-
-        // data.isGangHu = false;
-
-        // //
-        // data.actions = [];
-
-        // data.fan = 0;
-        // data.score = 0;
-        // data.lastFangGangSeat = -1;
-        
-        // //统计信息
-        // data.numZiMo = 0;
-        // data.numJiePao = 0;
-        // data.numDianPao = 0;
-        // data.numAnGang = 0;
-        // data.numMingGang = 0;
-        // data.numChaJiao = 0;
-
         gameSeatsOfUsers[data.userId] = data;
     }
     games[roomId] = game;
-
-    
 
     var numOfMJ = game.mahjongs.length - game.currentIndex;
     var huansanzhang = roomInfo.conf.hsz;
