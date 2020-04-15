@@ -1089,7 +1089,7 @@ exports.setReady = function(userId,callback){
 
     roomMgr.setReady(userId,true);
 
-    replyHero(userId);
+    // replyHero(userId);
 
     var game = games[roomId];
     if(game == null){
@@ -1206,7 +1206,7 @@ function store_game(game,callback){
     db.create_game(game.roomInfo.uuid,game.gameIndex,game.baseInfoJson,callback);
 }
 
-function replyHero(userId){
+exports.replyHero = function(userId){
     db.get_user_data_by_userid(userId,function(res){
         if(!res){
             return;

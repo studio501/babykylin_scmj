@@ -51,10 +51,23 @@ cc.Class({
         this.test_hero();
     },
     test_hero(){
+        cc.vv.net.send('queryhero');
+        cc.vv.utils.addClickEvent(cc.find("Canvas/heroroot/atk"),this.node,"ChessGame","atk_test");
+    },
+    atk_test(){
+        if(this.m_hero){
+            this.m_hero.getComponent('hero').attack(cc.p(300,100));
+        }
+    },
+    get_hero(cb){
         let self = this;
-        cc.loader.loadRes('sg/prefabs/hero',cc.Prefab,function(error,res){
+        cc.loader.loadRes('sg/prefabs/hero_1',cc.Prefab,function(error,res){
             let hero = cc.instantiate(res);
             hero.parent = self.node.getChildByName("heroroot")
+            self.m_hero = hero;
+            if(cb){
+                cb(hero);
+            }
         })
     },
 
@@ -271,6 +284,9 @@ cc.Class({
 
     onHeroDataResp(data){
         let a = data;
+        this.get_hero(function(hero){
+            hero.getComponent('hero').setData(data)
+        })
     },
 
     onGameBeign:function(){

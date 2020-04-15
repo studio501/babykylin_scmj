@@ -171,8 +171,10 @@ CREATE TABLE `t_heros` (
   `id` char(20) NOT NULL COMMENT '英雄ID',
   `uuid` char(20) NOT NULL COMMENT '英雄UUID',
   `name` varchar(32) DEFAULT NULL COMMENT '名字',
-  `hp` int(11) DEFAULT '0' COMMENT '血量',
+  `hp` int(11) DEFAULT '0' COMMENT '总血量',
+  `curhp` int(11) DEFAULT '0' COMMENT '当前血量',
   `mp` int(11) DEFAULT '0' COMMENT '蓝量',
+  `curmp` int(11) DEFAULT '0' COMMENT '当前蓝量',
   `atk` int(11) DEFAULT '0' COMMENT '攻击',
   `def` int(11) DEFAULT '0' COMMENT '物防',
   `spd` int(11) DEFAULT '0' COMMENT '速度',
@@ -184,6 +186,6 @@ CREATE TABLE `t_heros` (
   UNIQUE KEY `uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---                            id    uuid      name    hp    mp     atk    def   spd   lv  exp   sk1    sk1exp
-INSERT INTO `t_heros` VALUES ('1', 'asdnf12', '张飞', '100', '100', '20', '10', '10', '1', '0', '1221', '0');
-INSERT INTO `t_heros` VALUES ('2', '345znfa', '关羽', '110', '100', '20', '10', '10', '1', '0', '3121', '0');
+--                            id    uuid      name    hp     curhp  mp    curmp   atk    def   spd   lv  exp   sk1    sk1exp
+INSERT INTO `t_heros` VALUES ('1', 'asdnf12', '张飞', '100', '100', '100', '100', '20', '10', '10', '1', '0', '1221', '0');
+INSERT INTO `t_heros` VALUES ('2', '345znfa', '关羽', '110', '100', '100', '100', '20', '10', '10', '1', '0', '3121', '0');

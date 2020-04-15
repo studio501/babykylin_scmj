@@ -140,6 +140,14 @@ exports.start = function(conf,mgr){
 			}
 		});
 
+		socket.on('queryhero',function(){
+			if(!socket.userId){
+				//已经登陆过的就忽略
+				return;
+			}
+			socket.gameMgr.replyHero(socket.userId);
+		});
+
 		socket.on('ready',function(data){
 			var userId = socket.userId;
 			if(userId == null){
