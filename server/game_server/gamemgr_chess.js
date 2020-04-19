@@ -1077,7 +1077,7 @@ function recordGameAction(game,si,action,pai){
     }
 }
 
-exports.setReady = function(userId,callback){
+exports.setReady = function(userId){
     var roomId = roomMgr.getUserRoom(userId);
     if(roomId == null){
         return;
@@ -1105,17 +1105,13 @@ exports.setReady = function(userId,callback){
         }
     }
     else{
-        var numOfMJ = game.mahjongs.length - game.currentIndex;
-        var remainingGames = roomInfo.conf.maxGames - roomInfo.numOfGames;
-
         var data = {
             state:game.state,
-            numofmj:numOfMJ,
             button:game.button,
             turn:game.turn,
-            chuPai:game.chuPai,
-            huanpaimethod:game.huanpaiMethod,
-            chessArray: game.chessArray
+            // chuPai:game.chuPai,
+            // huanpaimethod:game.huanpaiMethod,
+            // chessArray: game.chessArray
         };
 
         data.seats = [];
@@ -1206,14 +1202,20 @@ function store_game(game,callback){
     db.create_game(game.roomInfo.uuid,game.gameIndex,game.baseInfoJson,callback);
 }
 
-exports.replyHero = function(userId){
+exports.replyHero = function(userId,cb){
     db.get_user_data_by_userid(userId,function(res){
         if(!res){
+            if(cb){
+                cb(null);
+            }
             return;
         }
         if(res.bindhero){
             db.get_hero_data(res.bindhero,null,function(herodata){
-                userMgr.sendMsg(userId,'push_hero_data',herodata);
+                if(cb){
+                    cb(herodata);
+                }
+                // userMgr.sendMsg(userId,'push_hero_data',herodata);
             })
         }
     })
@@ -1255,9 +1257,6 @@ exports.begin = function(roomId) {
         gameSeatsOfUsers[data.userId] = data;
     }
     games[roomId] = game;
-
-    var numOfMJ = game.mahjongs.length - game.currentIndex;
-    var huansanzhang = roomInfo.conf.hsz;
 
     for(var i = 0; i < seats.length; ++i){
         //开局时，通知前端必要的数据

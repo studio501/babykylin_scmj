@@ -1,3 +1,5 @@
+
+const SeatNum = 2;
 cc.Class({
     extends: cc.Component,
 
@@ -95,7 +97,7 @@ cc.Class({
     },
     
     getLocalIndex:function(index){
-        var ret = (index - this.seatIndex + 4) % 4;
+        var ret = (index - this.seatIndex + SeatNum) % SeatNum;
         return ret;
     },
     
@@ -170,8 +172,10 @@ cc.Class({
                 var data = data.data;
                 self.roomId = data.roomid;
                 self.conf = data.conf;
-                self.maxNumOfGames = data.conf.maxGames;
-                self.numOfGames = data.numofgames;
+                self.initdata = data;
+                self.gamestate = "begin";
+                // self.maxNumOfGames = data.conf.maxGames;
+                // self.numOfGames = data.numofgames;
                 self.seats = data.seats;
                 self.seatIndex = self.getSeatIndexByID(cc.vv.userMgr.userId);
                 self.isOver = false;

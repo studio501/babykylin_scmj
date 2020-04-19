@@ -32,7 +32,7 @@ cc.Class({
         this.queYiMen = gameChild.getChildByName("dingque");
         this.queYiMen.active = cc.vv.gameNetMgr.isDingQueing;
         
-        var arr = ["myself","right","up","left"];
+        var arr = ["myself","right"];
         for(var i = 0; i < arr.length; ++i){
             var side = gameChild.getChildByName(arr[i]);
             var seat = side.getChildByName("seat");

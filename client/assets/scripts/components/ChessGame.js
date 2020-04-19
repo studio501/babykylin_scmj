@@ -17,7 +17,7 @@ cc.Class({
         this.addComponent("NoticeTip");
         this.addComponent("GameOver");
         this.addComponent("DingQue");
-        this.addComponent("PengGangs");
+        // this.addComponent("PengGangs");
         this.addComponent("ChessRoom");
         this.addComponent("TimePointer");
         this.addComponent("GameResult");
@@ -56,14 +56,15 @@ cc.Class({
     },
     atk_test(){
         if(this.m_hero){
-            this.m_hero.getComponent('hero').attack(cc.p(300,100));
+            this.m_hero.getComponent('hero').attack(cc.v2(300,100));
         }
     },
     get_hero(cb){
         let self = this;
         cc.loader.loadRes('sg/prefabs/hero_1',cc.Prefab,function(error,res){
             let hero = cc.instantiate(res);
-            hero.parent = self.node.getChildByName("heroroot")
+            hero.parent = cc.find("Canvas/game/myself/seat/hero1");
+            hero.getComponent('hero').initView();
             self.m_hero = hero;
             if(cb){
                 cb(hero);
@@ -78,15 +79,20 @@ cc.Class({
         }
         cc.vv.net.send("zouzi",JSON.stringify(data));
     },
-
     initView(){
         //搜索需要的子节点
         var gameChild = this.node.getChildByName("game");
-        
+
+        if( cc.vv.gameNetMgr.initdata ){
+            this.onHeroDataResp(cc.vv.gameNetMgr.initdata.heros[0]);
+        }
+    },
+
+    start(){
     },
 
     onlyShowSide(){
-        var sides = ["myself","right","up","left"];
+        var sides = ["myself","right"];
         var gameChild = this.node.getChildByName("game");
         var chs = gameChild.children;
         for(var i = 0; i < chs.length; ++i){
@@ -277,13 +283,25 @@ cc.Class({
             self.refreshBoard(data)
         });
 
-        this.node.on('push_hero_data',function(data){
-            self.onHeroDataResp(data)
+        this.node.on('new_user',function(data){
+            self.initSingleSeat(data);
         });
+        
+        this.node.on('user_state_changed',function(data){
+            self.initSingleSeat(data);
+        });
+
+        // this.node.on('push_hero_data',function(data){
+        //     self.onHeroDataResp(data)
+        // });
+    },
+
+    initSingleSeat(data){
+        var index = cc.vv.gameNetMgr.getLocalIndex(seat.seatindex);
+        
     },
 
     onHeroDataResp(data){
-        let a = data;
         this.get_hero(function(hero){
             hero.getComponent('hero').setData(data)
         })

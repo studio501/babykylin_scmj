@@ -11,12 +11,15 @@ cc.Class({
     },
 
     // LIFE-CYCLE CALLBACKS:
-
     onLoad () {
+
+    },
+    initView () {
         let tn = this.node;
         tn.scale = this._initScale;
         this.m_ori_p = tn.position;
         this.m_hpmp = cc.find('root/statusroot',tn).addComponent('hpmp');
+        this.m_hpmp.initView();
         this.m_body_i = cc.find('root/body_i',tn);
         this.m_body_i_p = this.m_body_i.position;
         this.m_atktoggles = [

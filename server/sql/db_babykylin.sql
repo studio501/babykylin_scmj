@@ -188,4 +188,4 @@ CREATE TABLE `t_heros` (
 
 --                            id    uuid      name    hp     curhp  mp    curmp   atk    def   spd   lv  exp   sk1    sk1exp
 INSERT INTO `t_heros` VALUES ('1', 'asdnf12', '张飞', '100', '100', '100', '100', '20', '10', '10', '1', '0', '1221', '0');
-INSERT INTO `t_heros` VALUES ('2', '345znfa', '关羽', '110', '100', '100', '100', '20', '10', '10', '1', '0', '3121', '0');
+INSERT INTO `t_heros` VALUES ('2', '345znfa', '关羽', '110', '100', '100', '100', '20', '10', '9', '1', '0', '3121', '0');

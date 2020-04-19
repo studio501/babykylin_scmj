@@ -1,8 +1,12 @@
 cc.Class({
     extends: cc.Component,
-    onLoad () {
+    initView () {
         this.hppro = cc.find('hp',this.node).getComponent(cc.ProgressBar);
         this.mppro = cc.find('mp',this.node).getComponent(cc.ProgressBar);
+    },
+
+    onLoad () {
+
     },
 
     setPro(data){

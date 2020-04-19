@@ -75,10 +75,8 @@ var Global = cc.Class({
         
         startHearbeat:function(){
             this.sio.on('game_pong',function(){
-                console.log('game_pong');
                 self.lastRecieveTime = Date.now();
                 self.delayMS = self.lastRecieveTime - self.lastSendTime;
-                console.log(self.delayMS);
             });
             this.lastRecieveTime = Date.now();
             var self = this;

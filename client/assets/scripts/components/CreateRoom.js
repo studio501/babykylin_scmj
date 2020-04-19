@@ -111,6 +111,7 @@ cc.Class({
             conf = this.constructSCMJConf();
         }
         conf.type = type;
+        conf = {};
         conf.type = "chess";
 
         var data = {

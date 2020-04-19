@@ -48,7 +48,7 @@ cc.Class({
         this._timeLabel = cc.find("Canvas/infobar/time").getComponent(cc.Label);
         this.lblRoomNo.string = cc.vv.gameNetMgr.roomId;
         var gameChild = this.node.getChildByName("game");
-        var sides = ["myself","right","up","left"];
+        var sides = ["myself","right"];
         for(var i = 0; i < sides.length; ++i){
             var sideNode = gameChild.getChildByName(sides[i]);
             var seat = sideNode.getChildByName("seat");
@@ -178,6 +178,7 @@ cc.Class({
         this._seats[index].setOffline(isOffline);
         this._seats[index].setID(seat.userid);
         this._seats[index].voiceMsg(false);
+        this._seats[index].setHeros(seat.heros);
         
         this._seats2[index].setInfo(seat.name,seat.score);
         this._seats2[index].setZhuang(isZhuang);

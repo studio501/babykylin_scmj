@@ -29,7 +29,7 @@ cc.Class({
     initView:function(){
         this._folds = {};
         var game = this.node.getChildByName("game");
-        var sides = ["myself","right","up","left"];
+        var sides = ["myself","right"];
         for(var i = 0; i < sides.length; ++i){
             var sideName = sides[i];
             var sideRoot = game.getChildByName(sideName);

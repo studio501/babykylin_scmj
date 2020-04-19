@@ -41,10 +41,10 @@ exports.start = function(conf,mgr){
 			var time = data.time;
 			var sign = data.sign;
 
-			console.log(roomId);
-			console.log(token);
-			console.log(time);
-			console.log(sign);
+			console.log('roomId',roomId);
+			console.log('token',token);
+			console.log('time',time);
+			console.log('sign',sign);
 
 			
 			//检查参数合法性
@@ -117,35 +117,48 @@ exports.start = function(conf,mgr){
 					seats:seats
 				}
 			};
-			socket.emit('login_result',ret);
 
-			//通知其它客户端
-			userMgr.broacastInRoom('new_user_comes_push',userData,userId);
-			
-			socket.gameMgr = roomInfo.gameMgr;
+			var fn = function(){
+				socket.emit('login_result',ret);
+				//通知其它客户端
+				userMgr.broacastInRoom('new_user_comes_push',userData,userId);
+				
+				socket.gameMgr = roomInfo.gameMgr;
 
-			//玩家上线，强制设置为TRUE
-			socket.gameMgr.setReady(userId);
+				//玩家上线，强制设置为TRUE
+				socket.gameMgr.setReady(userId);
 
-			socket.emit('login_finished');
+				socket.emit('login_finished');
 
-			if(roomInfo.dr != null){
-				var dr = roomInfo.dr;
-				var ramaingTime = (dr.endTime - Date.now()) / 1000;
-				var data = {
-					time:ramaingTime,
-					states:dr.states
+				if(roomInfo.dr != null){
+					var dr = roomInfo.dr;
+					var ramaingTime = (dr.endTime - Date.now()) / 1000;
+					var data = {
+						time:ramaingTime,
+						states:dr.states
+					}
+					userMgr.sendMsg(userId,'dissolve_notice_push',data);	
 				}
-				userMgr.sendMsg(userId,'dissolve_notice_push',data);	
 			}
+
+			db.get_user_data_by_userid(userId,function(user_db_data){
+				var bind_hero_id = user_db_data.bindhero;
+				ret.data.user_db_data = user_db_data;
+				userData.user_db_data = user_db_data;
+				db.get_hero_data(bind_hero_id,null,function(bindhero){
+					bindhero.isBind = 1;
+					ret.data.heros = [bindhero];
+					userData.heros = [bindhero];
+					fn();
+				})
+			})
 		});
 
 		socket.on('queryhero',function(){
 			if(!socket.userId){
-				//已经登陆过的就忽略
 				return;
 			}
-			socket.gameMgr.replyHero(socket.userId);
+			// socket.gameMgr.replyHero(socket.userId);
 		});
 
 		socket.on('ready',function(data){
@@ -153,8 +166,10 @@ exports.start = function(conf,mgr){
 			if(userId == null){
 				return;
 			}
-			socket.gameMgr.setReady(userId);
-			userMgr.broacastInRoom('user_ready_push',{userid:userId,ready:true},userId,true);
+			socket.gameMgr.replyHero(userId,function(){
+				socket.gameMgr.setReady(userId);
+				userMgr.broacastInRoom('user_ready_push',{userid:userId,ready:true},userId,true);
+			});
 		});
 
 		//象棋逻辑

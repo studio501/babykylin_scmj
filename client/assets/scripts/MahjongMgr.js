@@ -53,7 +53,7 @@ cc.Class({
         if(cc.vv == null){
             return;
         }
-        this._sides = ["myself","right","up","left"];
+        this._sides = ["myself","right"];
         this._pres = ["M_","R_","B_","L_"];
         this._foldPres = ["B_","R_","B_","L_"];
         cc.vv.mahjongmgr = this; 

@@ -73,46 +73,36 @@ function constructRoomFromDb(dbdata){
 }
 
 exports.createRoom = function(creator,roomConf,gems,ip,port,callback){
-	if(
-		roomConf.type == null
-		|| roomConf.difen == null
-		|| roomConf.zimo == null
-		|| roomConf.jiangdui == null
-		|| roomConf.huansanzhang == null
-		|| roomConf.zuidafanshu == null
-		|| roomConf.jushuxuanze == null
-		|| roomConf.dianganghua == null
-		|| roomConf.menqing == null
-		|| roomConf.tiandihu == null){
+	if(roomConf.type == null){
 		callback(1,null);
 		return;
 	}
 
-	if(roomConf.difen < 0 || roomConf.difen > DI_FEN.length){
-		callback(1,null);
-		return;
-	}
+	// if(roomConf.difen < 0 || roomConf.difen > DI_FEN.length){
+	// 	callback(1,null);
+	// 	return;
+	// }
 
-	if(roomConf.zimo < 0 || roomConf.zimo > 2){
-		callback(1,null);
-		return;
-	}
+	// if(roomConf.zimo < 0 || roomConf.zimo > 2){
+	// 	callback(1,null);
+	// 	return;
+	// }
 
-	if(roomConf.zuidafanshu < 0 || roomConf.zuidafanshu > MAX_FAN.length){
-		callback(1,null);
-		return;
-	}
+	// if(roomConf.zuidafanshu < 0 || roomConf.zuidafanshu > MAX_FAN.length){
+	// 	callback(1,null);
+	// 	return;
+	// }
 
-	if(roomConf.jushuxuanze < 0 || roomConf.jushuxuanze > JU_SHU.length){
-		callback(1,null);
-		return;
-	}
+	// if(roomConf.jushuxuanze < 0 || roomConf.jushuxuanze > JU_SHU.length){
+	// 	callback(1,null);
+	// 	return;
+	// }
 	
-	var cost = JU_SHU_COST[roomConf.jushuxuanze];
-	if(cost > gems){
-		callback(2222,null);
-		return;
-	}
+	// var cost = JU_SHU_COST[roomConf.jushuxuanze];
+	// if(cost > gems){
+	// 	callback(2222,null);
+	// 	return;
+	// }
 
 	var fnCreate = function(){
 		var roomId = generateRoomId();
@@ -138,15 +128,15 @@ exports.createRoom = function(creator,roomConf,gems,ip,port,callback){
 						seats:[],
 						conf:{
 							type:roomConf.type,
-							baseScore:DI_FEN[roomConf.difen],
-						    zimo:roomConf.zimo,
-						    jiangdui:roomConf.jiangdui,
-						    hsz:roomConf.huansanzhang,
-						    dianganghua:parseInt(roomConf.dianganghua),
-						    menqing:roomConf.menqing,
-						    tiandihu:roomConf.tiandihu,
-						    maxFan:MAX_FAN[roomConf.zuidafanshu],
-						    maxGames:JU_SHU[roomConf.jushuxuanze],
+							// baseScore:DI_FEN[roomConf.difen],
+						    // zimo:roomConf.zimo,
+						    // jiangdui:roomConf.jiangdui,
+						    // hsz:roomConf.huansanzhang,
+						    // dianganghua:parseInt(roomConf.dianganghua),
+						    // menqing:roomConf.menqing,
+						    // tiandihu:roomConf.tiandihu,
+						    // maxFan:MAX_FAN[roomConf.zuidafanshu],
+						    // maxGames:JU_SHU[roomConf.jushuxuanze],
 						    creator:creator,
 						}
 					};
@@ -154,14 +144,14 @@ exports.createRoom = function(creator,roomConf,gems,ip,port,callback){
 					if(roomConf.type == "xlch"){
 						roomInfo.gameMgr = require("./gamemgr_xlch");
 					}
-					else if (roomInfo.conf.type == "xzdd"){
+					else if (roomConf.type == "xzdd"){
 						roomInfo.gameMgr = require("./gamemgr_xzdd");
 					}
-					else if(roomInfo.conf.type == "chess"){
+					else if(roomConf.type == "chess"){
 						roomInfo.gameMgr = require("./gamemgr_chess");
 					}
-					console.log(roomInfo.conf);
-					var seat_num = roomInfo.conf.type == "chess" ? 2 : 4;
+					// console.log(roomInfo.conf);
+					var seat_num = roomConf.type == "chess" ? 2 : 4;
 					for(var i = 0; i < seat_num; ++i){
 						roomInfo.seats.push({
 							userId:0,
