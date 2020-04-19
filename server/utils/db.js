@@ -632,6 +632,50 @@ exports.get_hero_data = function(heroId,id_key,callback){
     });
 };
 
+exports.get_user_data_arr = function(userids,callback){
+    if(!userids || userids.length === 0){
+        callback([]);
+        return;
+    }
+    var ti = 0;
+    var res = [];
+    var userids_len = userids.length;
+    var fn = function(){
+        if(ti >= userids_len){
+            return callback(res);
+        }
+        var user_id = userids[ti];
+        ti++;
+        exports.get_user_data_by_userid(user_id,function(user_data){
+            res.push(user_data);
+            fn();
+        })
+    }
+    fn();
+};
+
+exports.get_hero_data_arr = function(heroids,callback){
+    if(!heroids || heroids.length === 0){
+        callback([]);
+        return;
+    }
+    var ti = 0;
+    var res = [];
+    var heroids_len = heroids.length;
+    var fn = function(){
+        if(ti >= heroids_len){
+            return callback(res);
+        }
+        var hero_id = heroids[ti];
+        ti++;
+        exports.get_hero_data(hero_id,"id",function(hero_data){
+            res.push(hero_data);
+            fn();
+        })
+    }
+    fn();
+};
+
 exports.delete_room = function(roomId,callback){
     callback = callback == null? nop:callback;
     if(roomId == null){

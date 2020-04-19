@@ -10,7 +10,9 @@ cc.Class({
         prepareRoot:{
             default:null,
             type:cc.Node   
-        }
+        },
+
+        _seats: []
     },
     onLoad: function () {
         cc.vv.utils.setFitSreenMode();
@@ -55,23 +57,12 @@ cc.Class({
         cc.vv.utils.addClickEvent(cc.find("Canvas/heroroot/atk"),this.node,"ChessGame","atk_test");
     },
     atk_test(){
-        if(this.m_hero){
-            this.m_hero.getComponent('hero').attack(cc.v2(300,100));
-        }
+        let other_hero = cc.find("Canvas/game/right/seat/hero1");
+        let self_hero = cc.find("Canvas/game/myself/seat/hero1");
+        let wp = other_hero.parent.convertToWorldSpaceAR(other_hero.position);
+        let np = self_hero.convertToNodeSpaceAR(wp)
+        this._seats[0]._heroArr[0].getComponent('hero').attack(cc.v2(np.x,np.y));
     },
-    get_hero(cb){
-        let self = this;
-        cc.loader.loadRes('sg/prefabs/hero_1',cc.Prefab,function(error,res){
-            let hero = cc.instantiate(res);
-            hero.parent = cc.find("Canvas/game/myself/seat/hero1");
-            hero.getComponent('hero').initView();
-            self.m_hero = hero;
-            if(cb){
-                cb(hero);
-            }
-        })
-    },
-
     zouzi_test(){
         let data = {
             start:{hang:0,lie:0},
@@ -82,10 +73,11 @@ cc.Class({
     initView(){
         //搜索需要的子节点
         var gameChild = this.node.getChildByName("game");
-
-        if( cc.vv.gameNetMgr.initdata ){
-            this.onHeroDataResp(cc.vv.gameNetMgr.initdata.heros[0]);
+        var seatKey = ['Canvas/game/myself/seat','Canvas/game/right/seat'];
+        for(var i = 0; i < seatKey.length; ++i){
+            this._seats.push(cc.find(seatKey[i]).getComponent("Seat"));
         }
+        this.initSeats();
     },
 
     start(){
@@ -211,8 +203,8 @@ cc.Class({
         
         this.node.on('game_sync',function(data){
             self.onGameBeign();
-            self.refreshBoard(data)
-            self.checkIp();
+            // self.refreshBoard(data)
+            // self.checkIp();
         });
         
         this.node.on('game_chupai',function(data){
@@ -242,7 +234,7 @@ cc.Class({
         });
         
         this.node.on('game_action',function(data){
-            self.showAction(data);
+            // self.showAction(data);
         });
         
         this.node.on('mj_count',function(data){
@@ -296,15 +288,24 @@ cc.Class({
         // });
     },
 
-    initSingleSeat(data){
-        var index = cc.vv.gameNetMgr.getLocalIndex(seat.seatindex);
-        
+    initSeats:function(){
+        var seats = cc.vv.gameNetMgr.seats;
+        for(var i = 0; i < seats.length; ++i){
+            this.initSingleSeat(seats[i]);
+        }
     },
 
-    onHeroDataResp(data){
-        this.get_hero(function(hero){
-            hero.getComponent('hero').setData(data)
-        })
+    initSingleSeat(seat){
+        var index = cc.vv.gameNetMgr.getLocalIndex(seat.seatindex);
+        var isOffline = !seat.online;
+        
+        this._seats[index].setInfo(seat.name,seat.score);
+        this._seats[index].setReady(seat.ready);
+        this._seats[index].setOffline(isOffline);
+        this._seats[index].setID(seat.userid);
+        this._seats[index].voiceMsg(false);
+        this._seats[index].setHeros(seat.heros);
+        
     },
 
     onGameBeign:function(){
@@ -319,7 +320,7 @@ cc.Class({
         wanfa.string = cc.vv.gameNetMgr.getWanfa();
     },
     checkIp:function(){
-        if(cc.vv.gameNetMgr.gamestate == ''){
+        if(true || cc.vv.gameNetMgr.gamestate == ''){
             return;
         }
         var selfData = cc.vv.gameNetMgr.getSelfData();

@@ -1007,7 +1007,7 @@ function doGameOver(game,userId,forceEnd){
             roomInfo.nextButton = game.firstHupai;
         }
         else{
-            roomInfo.nextButton = (game.turn + 1) % 4;
+            roomInfo.nextButton = (game.turn + 1) % GameSeatNum;
         }
 
         if(old != roomInfo.nextButton){
@@ -1116,9 +1116,10 @@ exports.setReady = function(userId){
 
         data.seats = [];
         var seatData = null;
+        var user_ids = [];
         for(var i = 0; i < GameSeatNum; ++i){
             var sd = game.gameSeats[i];
-
+            user_ids.push(sd.userId);
             var s = {
                 userid:sd.userId,
                 folds:sd.folds,
@@ -1141,9 +1142,22 @@ exports.setReady = function(userId){
             data.seats.push(s);
         }
 
-        //同步整个信息给客户端
-        userMgr.sendMsg(userId,'game_sync_push',data);
-        sendOperations(game,seatData,game.chuPai);
+        db.get_user_data_arr(user_ids,function(user_datas){
+            var bind_hero_ids = [];
+            for(var j=0;j<user_datas.length;j++){
+                bind_hero_ids.push(user_datas[j].bindhero);
+            }
+
+            db.get_hero_data_arr(bind_hero_ids,function(heros){
+                for (var k=0;k<heros.length;k++){
+                    data.seats[k].heros = [heros[k]];
+                }
+
+                //同步整个信息给客户端
+                userMgr.sendMsg(userId,'game_sync_push',data);
+                sendOperations(game,seatData,game.chuPai);
+            })
+        });
     }
 }
 

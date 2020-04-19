@@ -172,7 +172,7 @@ cc.Class({
                 var data = data.data;
                 self.roomId = data.roomid;
                 self.conf = data.conf;
-                self.initdata = data;
+                // self.initdata = data;
                 self.gamestate = "begin";
                 // self.maxNumOfGames = data.conf.maxGames;
                 // self.numOfGames = data.numofgames;
@@ -241,10 +241,13 @@ cc.Class({
         
         cc.vv.net.addHandler("new_user_comes_push",function(data){
             //console.log(data);
+            console.log("new_user_comes_push,,,",data);
             var seatIndex = data.seatindex;
             var needCheckIp = false;
             if(self.seats[seatIndex].userid > 0){
                 self.seats[seatIndex].online = true;
+                // self.seats[seatIndex].heros = data.heros;
+                // self.seats[seatIndex].user_db_data = data.user_db_data;
                 if(self.seats[seatIndex].ip != data.ip){
                     self.seats[seatIndex].ip = data.ip;
                     needCheckIp = true;
@@ -349,6 +352,7 @@ cc.Class({
                 seat.iszimo = sd.iszimo;
                 seat.huinfo = sd.huinfo;
                 seat.huanpais = sd.huanpais;
+                seat.heros = sd.heros;
                 if(i == self.seatIndex){
                     self.dingque = sd.que;
                 }

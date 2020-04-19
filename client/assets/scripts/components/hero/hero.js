@@ -18,7 +18,8 @@ cc.Class({
         let tn = this.node;
         tn.scale = this._initScale;
         this.m_ori_p = tn.position;
-        this.m_hpmp = cc.find('root/statusroot',tn).addComponent('hpmp');
+        this.m_root = this.node.getChildByName("root");
+        this.m_hpmp = cc.find('statusroot',tn).addComponent('hpmp');
         this.m_hpmp.initView();
         this.m_body_i = cc.find('root/body_i',tn);
         this.m_body_i_p = this.m_body_i.position;
@@ -67,7 +68,9 @@ cc.Class({
         let back_dt = 0.4
         let dl_dt = 0.1
         this.m_atkAct = this.node.runAction(cc.spawn(
-            cc.sequence( cc.moveTo(go_dt,cc.v2(pos.x,pos.y)),cc.delayTime(dl_dt),cc.moveTo(back_dt,cc.v2(self.m_ori_p.x,self.m_ori_p.y)) ) ,
+            cc.sequence( cc.moveTo(go_dt,cc.v2(pos.x,pos.y)),cc.delayTime(dl_dt),cc.moveTo(back_dt,cc.v2(self.m_ori_p.x,self.m_ori_p.y)),cc.callFunc(function(){
+                self.idle();
+            }) ) ,
             cc.sequence(cc.delayTime(go_dt - dl_dt),cc.callFunc(function(){
                 self.toggleAtk(true)
             }),cc.delayTime(dl_dt*2),cc.callFunc(function(){
@@ -98,6 +101,14 @@ cc.Class({
             this.node.stopAction(this.m_atkAct);
             this.m_atkAct = null;
         }
+    },
+
+    setDirection(faceToRight){
+        if(this.m_faceToRight === faceToRight){
+            return;
+        }
+        this.m_faceToRight = faceToRight
+        this.m_root.scaleX = faceToRight ? 1 : -1;
     }
 
     // update (dt) {},

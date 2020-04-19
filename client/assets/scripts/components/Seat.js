@@ -32,12 +32,13 @@ cc.Class({
             return;
         }
         console.log("Seat onLoad,,,,");
+        this._isMyself = this.node.parent.getName() === "myself";
         this._sprIcon = this.node.getChildByName("icon").getComponent("ImageLoader");
         this._lblName = this.node.getChildByName("name").getComponent(cc.Label);
         this._lblScore = this.node.getChildByName("score").getComponent(cc.Label);
         this._voicemsg = this.node.getChildByName("voicemsg");
         this._xuanpai = this.node.getChildByName("xuanpai");
-        this._heroRoot = [this.node.getChildByName("hero1")];
+        this._heroRoot = this.node.getChildByName("hero1");
         this.refreshXuanPaiState();
         
         if(this._voicemsg){
@@ -224,15 +225,20 @@ cc.Class({
         }
     },
     setHeros: function(heros){
-        for(let i in heros){
+        if(!heros){
+            return;
+        }
+        for(let i=0;i<heros.length;i++){
             this._setHero(i,heros[i]);
         }
     },
 
     _setHero: function(index,herodata) {
+        let self = this;
         let hero_ins = this._heroArr[index];
         let fn = function(ins){
             ins.getComponent('hero').setData(herodata);
+            ins.getComponent('hero').setDirection(self._isMyself);
         };
 
         if(hero_ins){
@@ -243,14 +249,13 @@ cc.Class({
     },
 
     get_hero(index,cb){
-        index = index || 1;
+        index = index == null ? 0 : index;
         let self = this;
         cc.loader.loadRes('sg/prefabs/hero_1',cc.Prefab,function(error,res){
             let hero = cc.instantiate(res);
             self._heroArr[index] = hero;
-            hero.parent = self._heroRoot[parseInt(index)];
+            hero.parent = self._heroRoot;
             hero.getComponent('hero').initView();
-            self.m_hero = hero;
             if(cb){
                 cb(hero);
             }
