@@ -104,5 +104,9 @@
 			"service_group": "",
 			"not_service": false
 		}
-	]
+	],
+	"game": {
+		"name": "UNKNOW GAME",
+		"appid": "UNKNOW"
+	}
 }

@@ -1143,8 +1143,12 @@ exports.setReady = function(userId){
 
         gameutils.initActHeroOrder(data.seats);
 
+        for(var i = 0; i < data.seats.length; ++i){
+            var s = data.seats[i];
+            userMgr.sendMsg(s.userid,'game_sync_push',data);
+        }
         //同步整个信息给客户端
-        userMgr.sendMsg(userId,'game_sync_push',data);
+        // userMgr.sendMsg(userId,'game_sync_push',data);
         sendOperations(game,seatData,game.chuPai);
 
         // db.get_user_data_arr(user_ids,function(user_datas){
