@@ -78,32 +78,6 @@ exports.createRoom = function(creator,roomConf,gems,ip,port,callback){
 		return;
 	}
 
-	// if(roomConf.difen < 0 || roomConf.difen > DI_FEN.length){
-	// 	callback(1,null);
-	// 	return;
-	// }
-
-	// if(roomConf.zimo < 0 || roomConf.zimo > 2){
-	// 	callback(1,null);
-	// 	return;
-	// }
-
-	// if(roomConf.zuidafanshu < 0 || roomConf.zuidafanshu > MAX_FAN.length){
-	// 	callback(1,null);
-	// 	return;
-	// }
-
-	// if(roomConf.jushuxuanze < 0 || roomConf.jushuxuanze > JU_SHU.length){
-	// 	callback(1,null);
-	// 	return;
-	// }
-	
-	// var cost = JU_SHU_COST[roomConf.jushuxuanze];
-	// if(cost > gems){
-	// 	callback(2222,null);
-	// 	return;
-	// }
-
 	var fnCreate = function(){
 		var roomId = generateRoomId();
 		if(rooms[roomId] != null || creatingRooms[roomId] != null){
@@ -128,15 +102,6 @@ exports.createRoom = function(creator,roomConf,gems,ip,port,callback){
 						seats:[],
 						conf:{
 							type:roomConf.type,
-							// baseScore:DI_FEN[roomConf.difen],
-						    // zimo:roomConf.zimo,
-						    // jiangdui:roomConf.jiangdui,
-						    // hsz:roomConf.huansanzhang,
-						    // dianganghua:parseInt(roomConf.dianganghua),
-						    // menqing:roomConf.menqing,
-						    // tiandihu:roomConf.tiandihu,
-						    // maxFan:MAX_FAN[roomConf.zuidafanshu],
-						    // maxGames:JU_SHU[roomConf.jushuxuanze],
 						    creator:creator,
 						}
 					};
@@ -159,12 +124,6 @@ exports.createRoom = function(creator,roomConf,gems,ip,port,callback){
 							name:"",
 							ready:false,
 							seatIndex:i,
-							numZiMo:0,
-							numJiePao:0,
-							numDianPao:0,
-							numAnGang:0,
-							numMingGang:0,
-							numChaJiao:0,
 						});
 					}
 					
@@ -175,7 +134,6 @@ exports.createRoom = function(creator,roomConf,gems,ip,port,callback){
 						delete creatingRooms[roomId];
 						if(uuid != null){
 							roomInfo.uuid = uuid;
-							console.log(uuid);
 							rooms[roomId] = roomInfo;
 							totalRooms++;
 							callback(0,roomId);

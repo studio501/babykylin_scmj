@@ -41,19 +41,19 @@ cc.Class({
         this.isDingQueing = false;
         this.isHuanSanZhang = false;
         this.curaction = null;
-        for(var i = 0; i < this.seats.length; ++i){
-            this.seats[i].holds = [];
-            this.seats[i].folds = [];
-            this.seats[i].pengs = [];
-            this.seats[i].angangs = [];
-            this.seats[i].diangangs = [];
-            this.seats[i].wangangs = [];
-            this.seats[i].dingque = -1;
-            this.seats[i].ready = false;
-            this.seats[i].hued = false;
-            this.seats[i].huanpais = null;
-            this.huanpaimethod = -1;
-        }
+        // for(var i = 0; i < this.seats.length; ++i){
+        //     this.seats[i].holds = [];
+        //     this.seats[i].folds = [];
+        //     this.seats[i].pengs = [];
+        //     this.seats[i].angangs = [];
+        //     this.seats[i].diangangs = [];
+        //     this.seats[i].wangangs = [];
+        //     this.seats[i].dingque = -1;
+        //     this.seats[i].ready = false;
+        //     this.seats[i].hued = false;
+        //     this.seats[i].huanpais = null;
+        //     this.huanpaimethod = -1;
+        // }
     },
     
     clear:function(){
@@ -102,6 +102,9 @@ cc.Class({
     },
     
     prepareReplay:function(roomInfo,detailOfGame){
+        if(true){
+            return;
+        }
         this.roomId = roomInfo.id;
         this.seats = roomInfo.seats;
         this.turn = detailOfGame.base_info.button;
@@ -163,6 +166,34 @@ cc.Class({
         }
         return "";
     },
+
+    divideHeroGroup:function(seats,seatIndex){
+        if(!seats || seatIndex === undefined || seatIndex === null){
+            return;
+        }
+        for( var i = 0; i < seats.length; i++) {
+            var t_heros = seats[i].heros;
+            if(t_heros){
+                for( var j = 0; j < t_heros.length; j++) {
+                    t_heros[j].group = i === seatIndex ? 0 : 1;
+                }
+            }
+        }
+    },
+
+    _update_hero_data(data){
+        var seatIndex = this.seatIndex;
+        if(!data || seatIndex === undefined || seatIndex === null){
+            return;
+        }
+        let self = this;
+        for( var i = 0; i < data.seats.length; i++) {
+            if(self.seats[i]){
+                self.seats[i].heros = data.seats[i].heros;
+            }
+        }
+        self.divideHeroGroup(self.seats,self.seatIndex);
+    },
     
     initHandlers:function(){
         var self = this;
@@ -177,7 +208,10 @@ cc.Class({
                 // self.maxNumOfGames = data.conf.maxGames;
                 // self.numOfGames = data.numofgames;
                 self.seats = data.seats;
+                let s2 = cc.vv.gameNetMgr.seats;
+                let f1 = self.seats === s2;
                 self.seatIndex = self.getSeatIndexByID(cc.vv.userMgr.userId);
+                self.divideHeroGroup(self.seats,self.seatIndex);
                 self.isOver = false;
             }
             else{
@@ -259,10 +293,6 @@ cc.Class({
                 needCheckIp = true;
             }
             self.dispatchEvent('new_user',self.seats[seatIndex]);
-            
-            if(needCheckIp){
-                self.dispatchEvent('check_ip',self.seats[seatIndex]);
-            }
         });
         
         cc.vv.net.addHandler("user_state_push",function(data){
@@ -307,14 +337,20 @@ cc.Class({
             }
             self.dispatchEvent('game_holds');
         });
-         
+
         cc.vv.net.addHandler("game_begin_push",function(data){
             console.log('game_action_push');
             console.log(data);
-            self.button = data;
-            self.turn = self.button;
+            // self.button = data;
+            // self.turn = self.button;
+            self._update_hero_data(data);
             self.gamestate = "begin";
             self.dispatchEvent('game_begin');
+        });
+
+        cc.vv.net.addHandler("act_result",function(data){
+            self._update_hero_data(data);
+            self.dispatchEvent('act_result');
         });
         
         cc.vv.net.addHandler("game_playing_push",function(data){
@@ -328,35 +364,36 @@ cc.Class({
             console.log(data);
             self.numOfMJ = data.numofmj;
             self.gamestate = data.state;
-            if(self.gamestate == "dingque"){
-                self.isDingQueing = true;
-            }
-            else if(self.gamestate == "huanpai"){
-                self.isHuanSanZhang = true;
-            }
+            // if(self.gamestate == "dingque"){
+            //     self.isDingQueing = true;
+            // }
+            // else if(self.gamestate == "huanpai"){
+            //     self.isHuanSanZhang = true;
+            // }
             self.turn = data.turn;
             self.button = data.button;
-            self.chupai = data.chuPai;
-            self.huanpaimethod = data.huanpaimethod;
-            for(var i = 0; i < self.seats.length; ++i){
-                var seat = self.seats[i];
-                var sd = data.seats[i];
-                seat.holds = sd.holds;
-                seat.folds = sd.folds;
-                seat.angangs = sd.angangs;
-                seat.diangangs = sd.diangangs;
-                seat.wangangs = sd.wangangs;
-                seat.pengs = sd.pengs;
-                seat.dingque = sd.que;
-                seat.hued = sd.hued; 
-                seat.iszimo = sd.iszimo;
-                seat.huinfo = sd.huinfo;
-                seat.huanpais = sd.huanpais;
-                seat.heros = sd.heros;
-                if(i == self.seatIndex){
-                    self.dingque = sd.que;
-                }
-           }
+            // self.chupai = data.chuPai;
+            // self.huanpaimethod = data.huanpaimethod;
+            self._update_hero_data(data);
+        //     for(var i = 0; i < self.seats.length; ++i){
+        //         var seat = self.seats[i];
+        //         var sd = data.seats[i];
+        //         seat.holds = sd.holds;
+        //         seat.folds = sd.folds;
+        //         seat.angangs = sd.angangs;
+        //         seat.diangangs = sd.diangangs;
+        //         seat.wangangs = sd.wangangs;
+        //         seat.pengs = sd.pengs;
+        //         seat.dingque = sd.que;
+        //         seat.hued = sd.hued; 
+        //         seat.iszimo = sd.iszimo;
+        //         seat.huinfo = sd.huinfo;
+        //         seat.huanpais = sd.huanpais;
+        //         seat.heros = sd.heros;
+        //         if(i == self.seatIndex){
+        //             self.dingque = sd.que;
+        //         }
+        //    }
            self.dispatchEvent('game_sync');
         });
         
@@ -511,13 +548,13 @@ cc.Class({
         });
         
         cc.vv.net.addHandler("game_dingque_finish_push",function(data){
-            for(var i = 0; i < data.length; ++i){
-                self.seats[i].dingque = data[i];
-                if(i == self.seatIndex){
-                    self.dingque = data[i];
-                }
-            }
-            self.dispatchEvent('game_dingque_finish',data);
+            // for(var i = 0; i < data.length; ++i){
+            //     self.seats[i].dingque = data[i];
+            //     if(i == self.seatIndex){
+            //         self.dingque = data[i];
+            //     }
+            // }
+            // self.dispatchEvent('game_dingque_finish',data);
         });
         
         
@@ -548,107 +585,6 @@ cc.Class({
         cc.vv.net.addHandler("voice_msg_push",function(data){
             self.dispatchEvent("voice_msg",data);
         });
-    },
-    
-    doGuo:function(seatIndex,pai){
-        var seatData = this.seats[seatIndex];
-        var folds = seatData.folds;
-        folds.push(pai);
-        this.dispatchEvent('guo_notify',seatData);    
-    },
-    
-    doMopai:function(seatIndex,pai){
-        var seatData = this.seats[seatIndex];
-        if(seatData.holds){
-            seatData.holds.push(pai);
-            this.dispatchEvent('game_mopai',{seatIndex:seatIndex,pai:pai});            
-        }
-    },
-    
-    doChupai:function(seatIndex,pai){
-        this.chupai = pai;
-        var seatData = this.seats[seatIndex];
-        if(seatData.holds){             
-            var idx = seatData.holds.indexOf(pai);
-            seatData.holds.splice(idx,1);
-        }
-        this.dispatchEvent('game_chupai_notify',{seatData:seatData,pai:pai});    
-    },
-    
-    doPeng:function(seatIndex,pai){
-        var seatData = this.seats[seatIndex];
-        //移除手牌
-        if(seatData.holds){
-            for(var i = 0; i < 2; ++i){
-                var idx = seatData.holds.indexOf(pai);
-                seatData.holds.splice(idx,1);
-            }                
-        }
-            
-        //更新碰牌数据
-        var pengs = seatData.pengs;
-        pengs.push(pai);
-            
-        this.dispatchEvent('peng_notify',seatData);
-    },
-    
-    getGangType:function(seatData,pai){
-        if(seatData.pengs.indexOf(pai) != -1){
-            return "wangang";
-        }
-        else{
-            var cnt = 0;
-            for(var i = 0; i < seatData.holds.length; ++i){
-                if(seatData.holds[i] == pai){
-                    cnt++;
-                }
-            }
-            if(cnt == 3){
-                return "diangang";
-            }
-            else{
-                return "angang";
-            }
-        }
-    },
-    
-    doGang:function(seatIndex,pai,gangtype){
-        var seatData = this.seats[seatIndex];
-        
-        if(!gangtype){
-            gangtype = this.getGangType(seatData,pai);
-        }
-        
-        if(gangtype == "wangang"){
-            if(seatData.pengs.indexOf(pai) != -1){
-                var idx = seatData.pengs.indexOf(pai);
-                if(idx != -1){
-                    seatData.pengs.splice(idx,1);
-                }
-            }
-            seatData.wangangs.push(pai);      
-        }
-        if(seatData.holds){
-            for(var i = 0; i <= 4; ++i){
-                var idx = seatData.holds.indexOf(pai);
-                if(idx == -1){
-                    //如果没有找到，表示移完了，直接跳出循环
-                    break;
-                }
-                seatData.holds.splice(idx,1);
-            }
-        }
-        if(gangtype == "angang"){
-            seatData.angangs.push(pai);
-        }
-        else if(gangtype == "diangang"){
-            seatData.diangangs.push(pai);
-        }
-        this.dispatchEvent('gang_notify',{seatData:seatData,gangtype:gangtype});
-    },
-    
-    doHu:function(data){
-        this.dispatchEvent('hupai',data);
     },
     
     doTurnChange:function(si){

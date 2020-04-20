@@ -171,12 +171,6 @@ cc.Class({
             }
         }.bind(this));
     },
-    refreshBoard:function(data){
-        if(!data || !data.chessArray || !data.chessArray.length === 90){
-            return;
-        }
-        cc.log('refreshBoard,,,',data);
-    },
     initEventHandlers:function(){
         cc.vv.gameNetMgr.dataEventHandler = this.node;
         
@@ -190,7 +184,6 @@ cc.Class({
         
         this.node.on('game_begin',function(data){
             self.onGameBeign();
-            self.refreshBoard(data)
             //第一把开局，要提示
             if(cc.vv.gameNetMgr.numOfGames == 1){
                 self.checkIp();
@@ -203,8 +196,6 @@ cc.Class({
         
         this.node.on('game_sync',function(data){
             self.onGameBeign();
-            // self.refreshBoard(data)
-            // self.checkIp();
         });
         
         this.node.on('game_chupai',function(data){
@@ -216,6 +207,10 @@ cc.Class({
             if(!cc.vv.replayMgr.isReplay() && data.turn != cc.vv.gameNetMgr.seatIndex){
                 self.initMopai(data.turn,-1);
             }
+        });
+
+        this.node.on('act_result',function(){
+
         });
         
         this.node.on('game_mopai',function(data){
@@ -271,10 +266,6 @@ cc.Class({
             console.log('login_result');
         });
 
-        this.node.on('chess_move',function(data){
-            self.refreshBoard(data)
-        });
-
         this.node.on('new_user',function(data){
             self.initSingleSeat(data);
         });
@@ -314,6 +305,8 @@ cc.Class({
         }
         this.gameRoot.active = true;
         this.prepareRoot.active = false;
+
+        this.initSeats();
     },
     initWanfaLabel:function(){
         var wanfa = cc.find("Canvas/infobar/wanfa").getComponent(cc.Label);

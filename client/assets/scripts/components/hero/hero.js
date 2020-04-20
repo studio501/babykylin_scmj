@@ -7,7 +7,8 @@ cc.Class({
             default: [],        // The default value will be used only when the component attaching
             type: cc.SpriteFrame, // optional, default is typeof default
         },
-        _initScale : 3
+        _initScale : 3,
+        _focusDeltal : 5
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -28,8 +29,13 @@ cc.Class({
             [cc.find('root/body_a',tn),cc.find('root/foot_a',tn)]
         ];
 
+        this.m_triangle = cc.find('root/focus/tri',tn);
+        this.m_focus = cc.find('root/focus',tn);
+
         this.toggleAtk(false);
         this.idle();
+
+        cc.vv.utils.addClickEvent(cc.find('touch/touchbtn',tn),this.node,"hero","onTouchbtnClick");
     },
 
     start () {
@@ -43,9 +49,9 @@ cc.Class({
             console.error("hero set data null");
             return;
         }
-        data.curhp = 20;
         this.m_data = data;
         this.m_hpmp.setPro(data);
+        this.toggleFocus(data.group === 0 && data.act_state === 1);
     },
 
     toggleAtk(isAtk){
@@ -103,13 +109,47 @@ cc.Class({
         }
     },
 
+    try_clean_focus(){
+        if(this.m_focusAct){
+            this.m_triangle.stopAction(this.m_focusAct);
+            this.m_focusAct = null;
+        }
+    },
+
     setDirection(faceToRight){
         if(this.m_faceToRight === faceToRight){
             return;
         }
         this.m_faceToRight = faceToRight
         this.m_root.scaleX = faceToRight ? 1 : -1;
+    },
+
+    toggleFocus(isFocus){
+        if(this.m_isFocus === isFocus){
+            return;
+        }
+        this.m_isFocus = isFocus
+        this.m_focus.active = isFocus;
+        this.m_triangle.active = isFocus;
+        let ox = this.m_triangle.m_origin_x;
+        if(!ox){
+            ox = this.m_triangle.x;
+            this.m_triangle.m_origin_x = ox;
+        }
+        let oy = this.m_triangle.y;
+        if(isFocus){
+            this.try_clean_focus();
+            this.m_focusAct = this.m_triangle.runAction(cc.repeatForever(cc.sequence(cc.moveTo(0.2,cc.v2(ox - this._focusDeltal,oy)),
+            cc.moveTo(0.1,cc.v2(ox,oy)) )))
+        }
+    },
+
+    onTouchbtnClick(pSender,event){
+        if(this.m_data.act_state === 1){
+
+        }
     }
+
 
     // update (dt) {},
 });

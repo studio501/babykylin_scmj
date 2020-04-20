@@ -98,7 +98,8 @@ exports.start = function(conf,mgr){
 					name:rs.name,
 					online:online,
 					ready:rs.ready,
-					seatindex:i
+					seatindex:i,
+					heros:rs.heros
 				});
 
 				if(userId == rs.userId){
@@ -119,6 +120,7 @@ exports.start = function(conf,mgr){
 			};
 
 			var fn = function(){
+				var a = seats;
 				socket.emit('login_result',ret);
 				//通知其它客户端
 				userMgr.broacastInRoom('new_user_comes_push',userData,userId);
@@ -140,18 +142,16 @@ exports.start = function(conf,mgr){
 					userMgr.sendMsg(userId,'dissolve_notice_push',data);	
 				}
 			}
-			fn();
-			// db.get_user_data_by_userid(userId,function(user_db_data){
-			// 	var bind_hero_id = user_db_data.bindhero;
-			// 	ret.data.user_db_data = user_db_data;
-			// 	userData.user_db_data = user_db_data;
-			// 	db.get_hero_data(bind_hero_id,null,function(bindhero){
-			// 		bindhero.isBind = 1;
-			// 		ret.data.heros = [bindhero];
-			// 		userData.heros = [bindhero];
-			// 		fn();
-			// 	})
-			// })
+
+			db.get_user_data_by_userid(userId,function(user_db_data){
+				var bind_hero_id = user_db_data.bindhero;
+				db.get_hero_data(bind_hero_id,null,function(bindhero){
+					bindhero.isBind = 1;
+					roomInfo.seats[seatIndex].heros = [bindhero];
+					userData.heros = roomInfo.seats[seatIndex].heros;
+					fn();
+				})
+			})
 		});
 
 		socket.on('queryhero',function(){

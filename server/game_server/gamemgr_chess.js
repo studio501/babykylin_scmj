@@ -1,8 +1,10 @@
 var roomMgr = require("./roommgr");
 var userMgr = require("./usermgr");
 var mjutils = require('./mjutils');
-var chessutils = require('./chessutils');
+var gameutils = require('./gameutils');
+var act_handler = require('./act_handler');
 var db = require("../utils/db");
+var table = require("../utils/table");
 var crypto = require("../utils/crypto");
 var games = {};
 var gamesIdBase = 0;
@@ -1077,6 +1079,14 @@ function recordGameAction(game,si,action,pai){
     }
 }
 
+function sendActResult(seats){
+    var trim_seats = table.trimTbl(seats,["heros"]);
+    for(var i = 0; i < seats.length; ++i){
+        var s = seats[i];
+        userMgr.sendMsg(s.userId,'act_result',{seats:trim_seats});
+    }
+}
+
 exports.setReady = function(userId){
     var roomId = roomMgr.getUserRoom(userId);
     if(roomId == null){
@@ -1109,9 +1119,6 @@ exports.setReady = function(userId){
             state:game.state,
             button:game.button,
             turn:game.turn,
-            // chuPai:game.chuPai,
-            // huanpaimethod:game.huanpaiMethod,
-            // chessArray: game.chessArray
         };
 
         data.seats = [];
@@ -1122,18 +1129,9 @@ exports.setReady = function(userId){
             user_ids.push(sd.userId);
             var s = {
                 userid:sd.userId,
-                folds:sd.folds,
-                angangs:sd.angangs,
-                diangangs:sd.diangangs,
-                wangangs:sd.wangangs,
-                pengs:sd.pengs,
-                que:sd.que,
-                hued:sd.hued,
-                iszimo:sd.iszimo,
+                heros:sd._seat && sd._seat.heros
             }
             if(sd.userId == userId){
-                s.holds = sd.holds;
-                s.huanpais = sd.huanpais;
                 seatData = sd;
             }
             else{
@@ -1142,22 +1140,29 @@ exports.setReady = function(userId){
             data.seats.push(s);
         }
 
-        db.get_user_data_arr(user_ids,function(user_datas){
-            var bind_hero_ids = [];
-            for(var j=0;j<user_datas.length;j++){
-                bind_hero_ids.push(user_datas[j].bindhero);
-            }
 
-            db.get_hero_data_arr(bind_hero_ids,function(heros){
-                for (var k=0;k<heros.length;k++){
-                    data.seats[k].heros = [heros[k]];
-                }
+        gameutils.initActHeroOrder(data.seats);
 
-                //同步整个信息给客户端
-                userMgr.sendMsg(userId,'game_sync_push',data);
-                sendOperations(game,seatData,game.chuPai);
-            })
-        });
+        //同步整个信息给客户端
+        userMgr.sendMsg(userId,'game_sync_push',data);
+        sendOperations(game,seatData,game.chuPai);
+
+        // db.get_user_data_arr(user_ids,function(user_datas){
+        //     var bind_hero_ids = [];
+        //     for(var j=0;j<user_datas.length;j++){
+        //         bind_hero_ids.push(user_datas[j].bindhero);
+        //     }
+
+        //     db.get_hero_data_arr(bind_hero_ids,function(heros){
+        //         for (var k=0;k<heros.length;k++){
+        //             data.seats[k].heros = [heros[k]];
+        //         }
+
+        //         //同步整个信息给客户端
+        //         userMgr.sendMsg(userId,'game_sync_push',data);
+        //         sendOperations(game,seatData,game.chuPai);
+        //     })
+        // });
     }
 }
 
@@ -1250,15 +1255,10 @@ exports.begin = function(roomId) {
 
         currentIndex:0,
         gameSeats:new Array(GameSeatNum),
-        chessArray: new Array(RowNum*ColNum),
     };
 
     roomInfo.numOfGames++;
-
-    for(var i=0;i<StartBoardArray.length;i++){
-        game.chessArray[i] = StartBoardArray[i];
-    }
-
+    var hero_arr = [];
     for(var i = 0; i < GameSeatNum; ++i){
         var data = game.gameSeats[i] = {};
 
@@ -1268,15 +1268,21 @@ exports.begin = function(roomId) {
 
         data.userId = seats[i].userId;
 
+        data._seat = seats[i];
+
+        hero_arr.push(seats[i].heros);
+
         gameSeatsOfUsers[data.userId] = data;
     }
     games[roomId] = game;
 
+    gameutils.moveToNextHero(seats);
+    var trim_seats = table.trimTbl(seats,["heros"]);
     for(var i = 0; i < seats.length; ++i){
         //开局时，通知前端必要的数据
         var s = seats[i];
         //通知游戏开始
-        userMgr.sendMsg(s.userId,'game_begin_push', {chessArray:game.chessArray});
+        userMgr.sendMsg(s.userId,'game_begin_push',{seats:trim_seats});
     }
 };
 
@@ -1474,6 +1480,43 @@ exports.dingQue = function(userId,type){
         userMgr.broacastInRoom('game_dingque_notify_push',seatData.userId,seatData.userId,true);
     }
 };
+
+exports.heroAct = function(userId,actInfo){
+    if(table.isEmpty(actInfo)){
+        return;
+    }
+
+    var roomId = roomMgr.getUserRoom(userId);
+    if(roomId == null){
+        return;
+    }
+    var roomInfo = roomMgr.getRoom(roomId);
+    if(roomInfo == null){
+        return;
+    }
+
+    var now_act_hero = gameutils.getNowActHero(roomInfo.seats);
+    if(table.isEmpty(now_act_hero)){
+        return;
+    }
+
+    var srcId = actInfo.srcId;
+    if( srcId !== now_act_hero.id ){
+        return;
+    }
+
+    var targetIds = actInfo.targetIds;
+    var actKey = actInfo.actKey;
+    var act_func = act_handler[actKey];
+    if(act_func){
+        var targetHeros = gameutils.getAliveHeros(roomInfo.seats,targetIds);
+        for( var i = 0; i < targetHeros.length; i++) {
+            act_func(now_act_hero,targetHeros[i]);
+        }
+    }
+    gameutils.moveToNextHero(roomInfo.seats);
+    sendActResult(roomInfo.seats);
+}
 
 exports.chuPai = function(userId,pai){
 
@@ -2212,22 +2255,22 @@ exports.dissolveAgree = function(roomId,userId,agree){
 
 //象棋逻辑
 exports.move = function(userId,start_p,end_p){
-    var game = getGameByUserID(userId);
-    if(!game){
-        return;
-    }
+    // var game = getGameByUserID(userId);
+    // if(!game){
+    //     return;
+    // }
 
-    var chessArray = game.chessArray;
-    if(!chessArray){
-        return;
-    }
+    // var chessArray = game.chessArray;
+    // if(!chessArray){
+    //     return;
+    // }
 
-    var startIndex = chessutils.hanglie2index(start_p.hang,start_p.lie);
-    var endIndex = chessutils.hanglie2index(end_p.hang,end_p.lie);
-    chessArray[endIndex] = chessArray[startIndex];
-    chessArray[startIndex] = 0;
+    // var startIndex = chessutils.hanglie2index(start_p.hang,start_p.lie);
+    // var endIndex = chessutils.hanglie2index(end_p.hang,end_p.lie);
+    // chessArray[endIndex] = chessArray[startIndex];
+    // chessArray[startIndex] = 0;
 
-    userMgr.broacastInRoom('chess_move',{chessArray:chessArray},userId,true);
+    // userMgr.broacastInRoom('chess_move',{chessArray:chessArray},userId,true);
 }
 
 //同意开始
