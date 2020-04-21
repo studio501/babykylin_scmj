@@ -1,3 +1,6 @@
+
+import { loader_mgr } from '../base/loader/loader_mgr';
+import { handler, gen_handler } from "../base/util";
 cc.Class({
     extends: cc.Component,
 
@@ -31,7 +34,6 @@ cc.Class({
         if (cc.vv == null) {
             return;
         }
-        console.log("Seat onLoad,,,,");
         this._isMyself = this.node.parent.getName() === "myself";
         this._sprIcon = this.node.getChildByName("icon").getComponent("ImageLoader");
         this._lblName = this.node.getChildByName("name").getComponent(cc.Label);
@@ -226,12 +228,17 @@ cc.Class({
     },
     setHeros: function (heros) {
         console.log("setHeros,,,,");
-        if (!heros) {
+        if (!heros || !this._heroRoot) {
             return;
         }
         for (let i = 0; i < heros.length; i++) {
             this._setHero(i, heros[i]);
         }
+        // let self123 = this;
+        // loader_mgr.get_inst().loadPrefabObj('sg/prefabs/hero_1', gen_handler(function (hero, p1, p2, p3, p4) {
+        //     let f = this === self123;
+        //     hero.parent = self123.node;
+        // }, this, 'abcd', 123));
     },
 
     _setHero: function (index, herodata) {
@@ -252,18 +259,31 @@ cc.Class({
     get_hero(index, cb) {
         index = index == null ? 0 : index;
         let self = this;
-        cc.loader.loadRes('sg/prefabs/hero_1', cc.Prefab, function (error, res) {
-            let hero = self._heroArr[index];
-            if (!hero) {
-                hero = cc.instantiate(res);
-                self._heroArr[index] = hero;
-                hero.parent = self._heroRoot;
-                hero.getComponent('hero').initView();
+        loader_mgr.get_inst().loadPrefabObj('sg/prefabs/hero_1', gen_handler(function (hero) {
+            console.log('get_hero 1');
+            if (this._heroArr[index]) {
+                console.error('already had hero');
             }
+            this._heroArr[index] = hero;
+            hero.parent = this._heroRoot;
+            hero.getComponent('hero').initView();
             if (cb) {
                 cb(hero);
             }
-        })
+        }, this));
+        console.log('get_hero 2');
+        // cc.loader.loadRes('sg/prefabs/hero_1', cc.Prefab, function (error, res) {
+        //     let hero = self._heroArr[index];
+        //     if (!hero) {
+        //         hero = cc.instantiate(res);
+        //         self._heroArr[index] = hero;
+        //         hero.parent = self._heroRoot;
+        //         hero.getComponent('hero').initView();
+        //     }
+        //     if (cb) {
+        //         cb(hero);
+        //     }
+        // })
     },
 
     // called every frame, uncomment this function to activate update callback
