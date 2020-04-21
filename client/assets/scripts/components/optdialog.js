@@ -1,4 +1,4 @@
-const cus_event = require("../cus_event");
+import { EventTool } from "../base/event/event_tool";
 cc.Class({
     extends: cc.Component,
     onLoad() {
@@ -25,5 +25,6 @@ cc.Class({
     },
 
     onBackClick(event) {
+        EventTool.fireEvent("optdialog_back");
     }
 });

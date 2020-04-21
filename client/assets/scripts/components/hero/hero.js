@@ -1,3 +1,5 @@
+import { EventTool } from "../../base/event/event_tool";
+import { handler, gen_handler } from "../../base/util";
 cc.Class({
     extends: cc.Component,
 
@@ -43,6 +45,13 @@ cc.Class({
         this.idle();
 
         cc.vv.utils.addClickEvent(cc.find('touch/touchbtn', tn), this.node, "hero", "onTouchbtnClick");
+        EventTool.addEventListener("ready_normal_atk", gen_handler(function (t_group) {
+            let data = this.m_data;
+            if (!data) {
+                return;
+            }
+
+        }, this));
     },
 
     start() {
@@ -159,6 +168,10 @@ cc.Class({
         }
     },
 
+    setBeAttackBtn(isShow) {
+
+    },
+
     onTouchbtnClick(pSender, event) {
         if (this.m_data.act_state === 1) {
 
@@ -169,7 +182,8 @@ cc.Class({
     onFunbtnClick(event, ud) {
         switch (ud) {
             case 'atk': {
-
+                this.showFunctionBtns(false);
+                EventTool.fireEvent("ready_normal_atk", this.m_data.group);
             }
                 break;
             case 'zx': {
