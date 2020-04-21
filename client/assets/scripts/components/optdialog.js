@@ -1,7 +1,7 @@
 const cus_event = require("../cus_event");
 cc.Class({
     extends: cc.Component,
-    initView() {
+    onLoad() {
         let bgs = ["bg1", "bg0", "bg00"];
         this.bg_arr = [];
         for (var i = 0; i < bgs.length; i++) {
@@ -17,22 +17,13 @@ cc.Class({
     },
 
     setData(label_contens) {
+        this.node.active = true;
         for (var i = 0; i < label_contens.length; i++) {
             if (this.label_arr[i])
                 this.label_arr[i].string = label_contens[i];
         }
     },
 
-    get_back_event() {
-        let back_event = this.m_back_event
-        if (!back_event) {
-            back_event = new cus_event();
-            this.m_back_event = back_event
-        }
-        return back_event;
-    },
-
     onBackClick(event) {
-        this.get_back_event().emit();
     }
 });
