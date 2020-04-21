@@ -31,7 +31,7 @@ cc.Class({
         }
         
         this.initView();
-        this.initSeats();
+        // this.initSeats();
         this.initEventHandlers();
     },
     
@@ -101,7 +101,7 @@ cc.Class({
         
         this.node.on('game_begin',function(data){
             self.refreshBtns();
-            self.initSeats();
+            // self.initSeats();
         });
         
         this.node.on('game_num',function(data){
@@ -160,6 +160,9 @@ cc.Class({
     },
     
     initSeats:function(){
+        if(true){
+            return
+        }
         var seats = cc.vv.gameNetMgr.seats;
         for(var i = 0; i < seats.length; ++i){
             this.initSingleSeat(seats[i]);

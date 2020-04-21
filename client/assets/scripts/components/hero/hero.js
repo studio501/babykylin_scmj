@@ -32,7 +32,7 @@ cc.Class({
         this.m_funbtnRoot = cc.find('root/funbtns', tn);
         this.m_funbtns = [];
         for (let i = 0; i < 7; i++) {
-            var key = `funbtn${i+1}`;
+            var key = `funbtn${i + 1}`;
             this.m_funbtns.push(this.m_funbtnRoot.getChildByName(key));
         }
 
@@ -167,39 +167,35 @@ cc.Class({
 
 
     onFunbtnClick(event, ud) {
-        if (true) {
-            this.showFunctionBtns(false);
-            return;
-        }
         switch (ud) {
             case 'atk': {
 
             }
-            break;
-        case 'zx': {
-            this.showFunctionBtns(false);
-        }
-        break;
-        case 'zj': {
-            this.showFunctionBtns(false);
-        }
-        break;
-        case 'defense': {
-            this.showFunctionBtns(false);
-        }
-        break;
-        case 'skill': {
+                break;
+            case 'zx': {
+                this.showFunctionBtns(false);
+            }
+                break;
+            case 'zj': {
+                this.showFunctionBtns(false);
+            }
+                break;
+            case 'defense': {
+                this.showFunctionBtns(false);
+            }
+                break;
+            case 'skill': {
 
-        }
-        break
-        case 'item': {
+            }
+                break
+            case 'item': {
 
-        }
-        break;
-        case 'escape': {
-            this.showFunctionBtns(false);
-        }
-        break;
+            }
+                break;
+            case 'escape': {
+                this.showFunctionBtns(false);
+            }
+                break;
         }
         let f = event.currentTarget === this.m_funbtns[0];
         let a = 100;
