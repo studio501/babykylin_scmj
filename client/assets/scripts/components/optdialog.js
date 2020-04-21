@@ -25,6 +25,6 @@ cc.Class({
     },
 
     onBackClick(event) {
-        EventTool.fireEvent("optdialog_back");
+        event_mgr.get_inst().fire(Event_Name.optdialog_back);
     }
 });

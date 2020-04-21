@@ -1,4 +1,5 @@
-import { EventTool } from "../../base/event/event_tool";
+// assets/scripts/components/hero/hero.js
+import { Event_Name, event_mgr } from "../../base/event/event_mgr";
 import { handler, gen_handler } from "../../base/util";
 cc.Class({
     extends: cc.Component,
@@ -40,18 +41,21 @@ cc.Class({
 
         this.m_triangle = cc.find('root/focus/tri', tn);
         this.m_focus = cc.find('root/focus', tn);
+        this.m_beAtkBtn = cc.find('touch/beHitBtn', tn);
 
+        this.m_beAtkBtn.active = false;
         this.toggleAtk(false);
         this.idle();
 
         cc.vv.utils.addClickEvent(cc.find('touch/touchbtn', tn), this.node, "hero", "onTouchbtnClick");
-        EventTool.addEventListener("ready_normal_atk", gen_handler(function (t_group) {
-            let data = this.m_data;
-            if (!data) {
-                return;
-            }
+        cc.vv.utils.addClickEvent(this.m_beAtkBtn, this.node, "hero", "onBeAtkClick");
+        
+        event_mgr.get_inst().add(Event_Name.ready_normal_atk, this.onViewShow, this);
+    },
 
-        }, this));
+    ready_taken_atk(atkGroup){
+        let beHitGroup = atkGroup === 0 ? 1 : 0;
+        this.setBeAttackBtn(beHitGroup === this.m_data.group);
     },
 
     start() {
@@ -169,21 +173,26 @@ cc.Class({
     },
 
     setBeAttackBtn(isShow) {
-
+        this.m_beAtkBtn.active = isShow;
     },
 
-    onTouchbtnClick(pSender, event) {
+    onTouchbtnClick(event) {
         if (this.m_data.act_state === 1) {
 
         }
     },
 
+    onBeAtkClick(event){
+        let self = this;
+        this.m_beAtkBtn.active = false;
+        let id = this.m_data.id;
+    },
 
     onFunbtnClick(event, ud) {
         switch (ud) {
             case 'atk': {
                 this.showFunctionBtns(false);
-                EventTool.fireEvent("ready_normal_atk", this.m_data.group);
+                event_mgr.get_inst().fire(Event_Name.ready_normal_atk, this.m_data.group);
             }
                 break;
             case 'zx': {

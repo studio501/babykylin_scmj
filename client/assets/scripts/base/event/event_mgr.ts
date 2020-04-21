@@ -316,4 +316,10 @@ export enum Event_Name {
     LANGUAGE_USED = "LANGUAGE_USED",
     REMOTE_ASSETS_UPDATED = "REMOTE_ASSETS_UPDATED",
     CONFIG_UPDATED = "CONFIG_UPDATED",
+
+    // game event & almost all custom event
+    // 点击了攻击按钮
+    ready_normal_atk = "ready_normal_atk",
+    // 处于攻击或者发动技能时候选择返回
+    optdialog_back = "optdialog_back",
 }
