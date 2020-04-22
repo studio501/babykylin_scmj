@@ -50,7 +50,10 @@ cc.Class({
         cc.vv.utils.addClickEvent(cc.find('touch/touchbtn', tn), this.node, "hero", "onTouchbtnClick");
         cc.vv.utils.addClickEvent(this.m_beAtkBtn, this.node, "hero", "onBeAtkClick");
         
-        event_mgr.get_inst().add(Event_Name.ready_normal_atk, this.onViewShow, this);
+        event_mgr.get_inst().add(Event_Name.ready_normal_atk, this.ready_taken_atk, this);
+    },
+    onDestroy(){
+        event_mgr.get_inst().remove(Event_Name.ready_normal_atk, this.ready_taken_atk, this);
     },
 
     ready_taken_atk(atkGroup){
