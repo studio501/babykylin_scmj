@@ -19,7 +19,7 @@ cc.Class({
     setData(label_contens) {
         this.node.active = true;
         for (var i = 0; i < label_contens.length; i++) {
-            if (this.label_arr[i])
+            if (this.label_arr[i] && label_contens[i])
                 this.label_arr[i].string = label_contens[i];
         }
     },

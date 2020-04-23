@@ -295,6 +295,17 @@ export class loader_mgr
         });
     }
 
+    // 注调此方法时请确保已经预加载过资源
+    loadPrefabObjSync(url:string)
+    {
+        let res = null;
+        this.loadPrefabObj(url,gen_handler(function(nodeIns){
+            res = nodeIns;
+        },this));
+
+        return res;
+    }
+
     /**从resources目录加载prefab列表(省略资源后缀)，加载成功后生成prefab实例*/
     loadPrefabObjArray(urls:string[], cb:handler)
     {

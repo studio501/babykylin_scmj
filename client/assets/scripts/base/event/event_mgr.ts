@@ -322,4 +322,8 @@ export enum Event_Name {
     ready_normal_atk = "ready_normal_atk",
     // 处于攻击或者发动技能时候选择返回
     optdialog_back = "optdialog_back",
+    // 以英雄为目标
+    set_target_hero = "set_target_hero",
+    // 确定英雄为目标
+    ensure_target_hero = "ensure_target_hero",
 }

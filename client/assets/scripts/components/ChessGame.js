@@ -1,3 +1,8 @@
+import { Event_Name, event_mgr } from "../base/event/event_mgr";
+import { loader_mgr } from '../base/loader/loader_mgr';
+import { handler, gen_handler } from "../base/util";
+const table = require("../table");
+
 cc.Class({
     extends: cc.Component,
 
@@ -210,7 +215,11 @@ cc.Class({
         });
 
         this.node.on('act_result', function () {
-
+            let data = cc.vv.mahjongmgr.accessAtkData();
+            self.applyAtk(data, function () {
+                cc.vv.mahjongmgr.accessAtkData(null, true);
+                self.initSeats();
+            })
         });
 
         this.node.on('game_mopai', function (data) {
@@ -274,9 +283,56 @@ cc.Class({
             self.initSingleSeat(data);
         });
 
+
+        event_mgr.get_inst().add(Event_Name.set_target_hero, this.showHeroInfoPanel, this);
+
         // this.node.on('push_hero_data',function(data){
         //     self.onHeroDataResp(data)
         // });
+    },
+
+    getSpdDesc: function (spd) {
+        let spd_num = this.m_spd_num;
+        if (!spd_num) {
+            spd_num = {
+                [1]: cc.vv.utils.getLang('1'),
+                [2]: cc.vv.utils.getLang('2'),
+                [3]: cc.vv.utils.getLang('3'),
+                [4]: cc.vv.utils.getLang('4'),
+                [5]: cc.vv.utils.getLang('5'),
+                [6]: cc.vv.utils.getLang('6'),
+                [7]: cc.vv.utils.getLang('7'),
+                [8]: cc.vv.utils.getLang('8')
+            };
+            this.m_spd_num = spd_num;
+        }
+        return spd_num[spd];
+    },
+
+    showHeroInfoPanel: function (hero_data) {
+        let heroInfoPanel = this.m_heroInfoPanel;
+        if (!heroInfoPanel) {
+            heroInfoPanel = loader_mgr.get_inst().loadPrefabObjSync('sg/prefabs/opt_dialog');
+            heroInfoPanel.parent = this.node.getChildByName("game_opt_root")
+            this.m_heroInfoPanel = heroInfoPanel;
+        }
+
+        heroInfoPanel.active = !!hero_data;
+        if (hero_data) {
+            heroInfoPanel.getComponent('optdialog').setData(
+                [
+                    "普通攻击",
+                    hero_data.name,
+                    `血:${hero_data.curhp}`,
+                    `精:${hero_data.curmp}`,
+                    this.getSpdDesc(hero_data.roundspd),
+                ]
+            )
+        }
+    },
+
+    onDestroy() {
+        event_mgr.get_inst().remove(Event_Name.set_target_hero, this.showHeroInfoPanel, this);
     },
 
     initSeats: function () {
@@ -312,6 +368,20 @@ cc.Class({
         var wanfa = cc.find("Canvas/infobar/wanfa").getComponent(cc.Label);
         wanfa.string = cc.vv.gameNetMgr.getWanfa();
     },
+
+    applyAtk: function (atkData, callback) {
+
+    },
+
+    find_hero_by_id: function (id) {
+        for (var i = 0; i < this._seats.length; i++) {
+            let find_hero = this._seats[i].find_hero_by_id(id);
+            if (find_hero) {
+                return find_hero;
+            }
+        }
+    },
+
     checkIp: function () {
         if (true || cc.vv.gameNetMgr.gamestate == '') {
             return;

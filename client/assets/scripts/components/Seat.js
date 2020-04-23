@@ -1,6 +1,9 @@
 
 import { loader_mgr } from '../base/loader/loader_mgr';
 import { handler, gen_handler } from "../base/util";
+
+const table = require("../table");
+
 cc.Class({
     extends: cc.Component,
 
@@ -231,6 +234,7 @@ cc.Class({
         if (!heros || !this._heroRoot) {
             return;
         }
+        this.m_all_heros = heros;
         for (let i = 0; i < heros.length; i++) {
             this._setHero(i, heros[i]);
         }
@@ -239,6 +243,15 @@ cc.Class({
         //     let f = this === self123;
         //     hero.parent = self123.node;
         // }, this, 'abcd', 123));
+    },
+    find_hero_by_id: function (hero_id) {
+        if (!this._heroArr) {
+            return
+        }
+        let res = table.find(this._heroArr, function (cur) {
+            return hero_id === cur.getComponent('hero').getData().id;
+        })
+        return res && res.value;
     },
 
     _setHero: function (index, herodata) {

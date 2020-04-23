@@ -49,16 +49,53 @@ cc.Class({
 
         cc.vv.utils.addClickEvent(cc.find('touch/touchbtn', tn), this.node, "hero", "onTouchbtnClick");
         cc.vv.utils.addClickEvent(this.m_beAtkBtn, this.node, "hero", "onBeAtkClick");
-        
+
         event_mgr.get_inst().add(Event_Name.ready_normal_atk, this.ready_taken_atk, this);
+        event_mgr.get_inst().add(Event_Name.set_target_hero, this.change_target, this);
+        event_mgr.get_inst().add(Event_Name.ensure_target_hero, this.ensure_target, this);
     },
-    onDestroy(){
+    onDestroy() {
         event_mgr.get_inst().remove(Event_Name.ready_normal_atk, this.ready_taken_atk, this);
+        event_mgr.get_inst().remove(Event_Name.set_target_hero, this.change_target, this);
+        event_mgr.get_inst().remove(Event_Name.ensure_target_hero, this.ensure_target, this);
     },
 
-    ready_taken_atk(atkGroup){
+    ready_taken_atk(atkGroup) {
         let beHitGroup = atkGroup === 0 ? 1 : 0;
         this.setBeAttackBtn(beHitGroup === this.m_data.group);
+        if (beHitGroup === this.m_data.group) {
+            this.m_beatk_cnt = 0;
+            if (!this.accessSeatData("default_atk_flag")) {
+                this.accessSeatData("default_atk_flag", true)
+                this.onBeAtkClick()
+            }
+        }
+    },
+
+    ensure_target() {
+        if (hero_data.group === this.m_data.group) {
+            this.onBeAtkClick();
+        }
+    },
+
+    change_target(hero_data) {
+        if (!hero_data) {
+            return;
+        }
+        if (hero_data.group === this.m_data.group) {
+            this.m_beatk_cnt = 0;
+        }
+    },
+
+    accessSeatData(key, value) {
+        let parent = this.node.parent;
+        if (parent) {
+            if (value === null || value === undefined) {
+                return parent[key];
+            } else {
+                parent[key] = value
+            }
+        }
     },
 
     start() {
@@ -74,7 +111,9 @@ cc.Class({
         }
         this.m_data = data;
         this.m_hpmp.setPro(data);
-        this.toggleFocus(data.group === 0 && data.act_state === 1);
+        let is_act_one = data.group === 0 && data.act_state === 1;
+        this.toggleFocus(is_act_one);
+        this.showFunctionBtns(is_act_one);
     },
 
     toggleAtk(isAtk) {
@@ -161,7 +200,6 @@ cc.Class({
         this.m_isFocus = isFocus
         this.m_focus.active = isFocus;
         this.m_triangle.active = isFocus;
-        this.showFunctionBtns(isFocus);
         let ox = this.m_triangle.m_origin_x;
         if (!ox) {
             ox = this.m_triangle.x;
@@ -185,16 +223,42 @@ cc.Class({
         }
     },
 
-    onBeAtkClick(event){
-        let self = this;
-        this.m_beAtkBtn.active = false;
-        let id = this.m_data.id;
+    onBeAtkClick(event) {
+        this.m_beatk_cnt = (this.m_beatk_cnt || 0) + 1;
+        if (this.m_beatk_cnt === 1) {
+            event_mgr.get_inst().fire(Event_Name.set_target_hero, this.m_data);
+            this.m_beatk_cnt = 1;
+            this.toggleFocus(true);
+        }
+        else {
+            this.m_beAtkBtn.active = false;
+            this.m_beatk_cnt = 0;
+            this.toggleFocus(false);
+            this.accessSeatData("default_atk_flag", false);
+
+            let atk_hero = cc.vv.mahjongmgr.accessActHero();
+            if (!atk_hero) {
+                return;
+            }
+            let send_data = {
+                srcId: atk_hero.id,
+                targetIds: [this.m_data.id],
+                actKey: "normal_attack"
+            }
+            cc.vv.mahjongmgr.accessAtkData(send_data);
+            event_mgr.get_inst().fire(Event_Name.set_target_hero, null);
+            cc.vv.net.send("heroAct", send_data);
+        }
+
+
     },
 
     onFunbtnClick(event, ud) {
+        cc.vv.mahjongmgr.accessActHero(this.m_data);
         switch (ud) {
             case 'atk': {
                 this.showFunctionBtns(false);
+                this.toggleFocus(false);
                 event_mgr.get_inst().fire(Event_Name.ready_normal_atk, this.m_data.group);
             }
                 break;
@@ -223,8 +287,10 @@ cc.Class({
             }
                 break;
         }
-        let f = event.currentTarget === this.m_funbtns[0];
-        let a = 100;
+    },
+
+    getData() {
+        return this.m_data;
     }
 
 
