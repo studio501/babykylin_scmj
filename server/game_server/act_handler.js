@@ -1,4 +1,5 @@
 exports.act_handler = {
+    // 普通攻击
     normal_attack: function (srcHero, dstHero) {
         var atk = srcHero.atk;
         var def = dstHero.def;

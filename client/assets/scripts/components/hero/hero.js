@@ -127,7 +127,7 @@ cc.Class({
         }
     },
 
-    attack(pos) {
+    attack(pos, cb) {
         this.try_clean_idle();
         this.try_clean_atk();
         this.node.position = this.m_ori_p;
@@ -138,6 +138,9 @@ cc.Class({
         this.m_atkAct = this.node.runAction(cc.spawn(
             cc.sequence(cc.moveTo(go_dt, cc.v2(pos.x, pos.y)), cc.delayTime(dl_dt), cc.moveTo(back_dt, cc.v2(self.m_ori_p.x, self.m_ori_p.y)), cc.callFunc(function () {
                 self.idle();
+                if(cb){
+                    cb();
+                }
             })),
             cc.sequence(cc.delayTime(go_dt - dl_dt), cc.callFunc(function () {
                 self.toggleAtk(true)

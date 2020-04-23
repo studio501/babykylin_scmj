@@ -1079,11 +1079,11 @@ function recordGameAction(game, si, action, pai) {
     }
 }
 
-function sendActResult(seats) {
+function sendActResult(seats,actInfo) {
     var trim_seats = table.trimTbl(seats, ["heros"]);
     for (var i = 0; i < seats.length; ++i) {
         var s = seats[i];
-        userMgr.sendMsg(s.userId, 'act_result', { seats: trim_seats });
+        userMgr.sendMsg(s.userId, 'act_result', { seats: trim_seats,actInfo: actInfo });
     }
 }
 
@@ -1520,7 +1520,7 @@ exports.heroAct = function (userId, actInfo) {
         }
     }
     gameutils.moveToNextHero(roomInfo.seats);
-    sendActResult(roomInfo.seats);
+    sendActResult(roomInfo.seats,actInfo);
 }
 
 exports.chuPai = function (userId, pai) {

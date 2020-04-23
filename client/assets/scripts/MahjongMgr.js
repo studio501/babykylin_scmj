@@ -209,7 +209,7 @@ cc.Class({
         return this.accessData("m_rec_hero", force_clean === true ? false : hero_data);
     },
 
-    accessAtkData: function (data) {
+    accessAtkData: function (data, force_clean) {
         return this.accessData("m_atk_data", force_clean === true ? false : data);
     }
 });

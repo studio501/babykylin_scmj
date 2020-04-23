@@ -354,7 +354,7 @@ cc.Class({
 
         cc.vv.net.addHandler("act_result", function (data) {
             self._update_hero_data(data);
-            self.dispatchEvent('act_result');
+            self.dispatchEvent('act_result',data);
         });
 
         cc.vv.net.addHandler("game_playing_push", function (data) {

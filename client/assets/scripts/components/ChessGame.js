@@ -59,7 +59,7 @@ cc.Class({
     },
     test_hero() {
         cc.vv.net.send('queryhero');
-        cc.vv.utils.addClickEvent(cc.find("Canvas/heroroot/atk"), this.node, "ChessGame", "atk_test");
+        // cc.vv.utils.addClickEvent(cc.find("Canvas/heroroot/atk"), this.node, "ChessGame", "atk_test");
     },
     atk_test() {
         let other_hero = cc.find("Canvas/game/right/seat/hero1");
@@ -214,10 +214,11 @@ cc.Class({
             }
         });
 
-        this.node.on('act_result', function () {
-            let data = cc.vv.mahjongmgr.accessAtkData();
-            self.applyAtk(data, function () {
-                cc.vv.mahjongmgr.accessAtkData(null, true);
+        this.node.on('act_result', function (data) {
+            if(!data || !data.actInfo){
+                return;
+            }
+            self.applyAtk(data.actInfo, function () {
                 self.initSeats();
             })
         });
@@ -370,9 +371,15 @@ cc.Class({
     },
 
     applyAtk: function (atkData, callback) {
-
+        if(!atkData || !atkData.srcId || !atkData.targetIds){
+            return;
+        }
+        let src_hero = this.find_hero_by_id(atkData.srcId);
+        let dst_hero = this.find_hero_by_id(atkData.targetIds[0]);
+        let wp = dst_hero.parent.convertToWorldSpaceAR(dst_hero.position);
+        let np = src_hero.parent.convertToNodeSpaceAR(wp);
+        src_hero.getComponent('hero').attack(cc.v2(np.x, np.y),callback);
     },
-
     find_hero_by_id: function (id) {
         for (var i = 0; i < this._seats.length; i++) {
             let find_hero = this._seats[i].find_hero_by_id(id);
