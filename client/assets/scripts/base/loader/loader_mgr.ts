@@ -374,6 +374,31 @@ export class loader_mgr
         });
     }
 
+    loadJsonDir(dir_path:string, cb: any)
+    {
+        let map:any = {};
+        cc.loader.loadResDir(dir_path, cc.JsonAsset, (err:any, res_arr:any[], urls:string[]) => {
+            if(err)
+            {
+                cc.warn("loadJsonAssetDir error", dir_path);
+                return;
+            }
+            let isValid = true;
+            urls.forEach(url => {
+                const res:cc.JsonAsset = cc.loader.getRes(url, cc.JsonAsset);
+                if(!cc.isValid(res)) {
+                    isValid = false;
+                    return;
+                }
+                map[url] = res;
+                this.cacheAsset(res);
+            });
+            if(isValid && cb) {
+                cb(map);
+            }
+        });
+    }
+
     loadPrefabObjDir(dir_path:string, cb:handler):void
     {
         let map:any = {};
