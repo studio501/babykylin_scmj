@@ -215,11 +215,14 @@ cc.Class({
         });
 
         this.node.on('act_result', function (data) {
-            if(!data || !data.actInfo){
+            if (!data || !data.actInfo) {
                 return;
             }
             self.applyAtk(data.actInfo, function () {
                 self.initSeats();
+                if (data.game_over_data) {
+                    self.show_game_over(data.game_over_data);
+                }
             })
         });
 
@@ -371,14 +374,14 @@ cc.Class({
     },
 
     applyAtk: function (atkData, callback) {
-        if(!atkData || !atkData.srcId || !atkData.targetIds){
+        if (!atkData || !atkData.srcId || !atkData.targetIds) {
             return;
         }
         let src_hero = this.find_hero_by_id(atkData.srcId);
         let dst_hero = this.find_hero_by_id(atkData.targetIds[0]);
         let wp = dst_hero.parent.convertToWorldSpaceAR(dst_hero.position);
         let np = src_hero.parent.convertToNodeSpaceAR(wp);
-        src_hero.getComponent('hero').attack(cc.v2(np.x, np.y),callback);
+        src_hero.getComponent('hero').attack(cc.v2(np.x, np.y), callback);
     },
     find_hero_by_id: function (id) {
         for (var i = 0; i < this._seats.length; i++) {
@@ -387,6 +390,17 @@ cc.Class({
                 return find_hero;
             }
         }
+    },
+
+    show_game_over: function (game_over_data) {
+        let gameoverPanel = this.m_gameoverPanel;
+        if (!gameoverPanel) {
+            gameoverPanel = loader_mgr.get_inst().loadPrefabObjSync('sg/prefabs/opt_dialog');
+            gameoverPanel.parent = this.node.getChildByName("game_opt_root")
+            this.m_gameoverPanel = gameoverPanel;
+        }
+
+        gameoverPanel.active = !!hero_data;
     },
 
     checkIp: function () {

@@ -19,36 +19,7 @@ var ACTION_ZOUZI = 7;
 
 var gameSeatsOfUsers = {};
 
-//象棋
 const GameSeatNum = 2;
-const RowNum = 10;
-const ColNum = 9;
-const StartBoardArray = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9,
-    0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 10, 0, 0, 0, 0, 0, 11, 0,
-    12, 0, 13, 0, 14, 0, 15, 0, 16,
-    0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0,
-    17, 0, 18, 0, 19, 0, 20, 0, 21,
-    0, 22, 0, 0, 0, 0, 0, 23, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0,
-    24, 25, 26, 27, 28, 29, 30, 31, 32
-];
-
-const Blank = 0;
-const Che = 1;
-const Ma = 2;
-const Xiang = 3;
-const Shi = 4;
-const Shuai = 5;
-const Pao = 6;
-const Bing = 7;
-const ChessConfig = {
-    ChessType: {
-
-    }
-}
 
 function getMJType(id) {
     if (id >= 0 && id < 9) {
@@ -1079,12 +1050,22 @@ function recordGameAction(game, si, action, pai) {
     }
 }
 
-function sendActResult(seats,actInfo) {
+function sendActResult(seats, actInfo, game_over_data) {
     var trim_seats = table.trimTbl(seats, ["heros"]);
     for (var i = 0; i < seats.length; ++i) {
         var s = seats[i];
-        userMgr.sendMsg(s.userId, 'act_result', { seats: trim_seats,actInfo: actInfo });
+        userMgr.sendMsg(s.userId, 'act_result', { seats: trim_seats, actInfo: actInfo, game_over_data: game_over_data });
     }
+}
+
+function get_aliveHeros(heros) {
+    if (table.isEmpty(heros)) {
+        return [];
+    }
+
+    return table.findAll(heros, function (cur) {
+        return cur.curhp > 0;
+    })
 }
 
 exports.setReady = function (userId) {
@@ -1500,7 +1481,8 @@ exports.heroAct = function (userId, actInfo) {
         return;
     }
 
-    var now_act_hero = gameutils.getNowActHero(roomInfo.seats);
+    var room_seats = roomInfo.seats;
+    var now_act_hero = gameutils.getNowActHero(room_seats);
     if (table.isEmpty(now_act_hero)) {
         return;
     }
@@ -1514,13 +1496,28 @@ exports.heroAct = function (userId, actInfo) {
     var actKey = actInfo.actKey;
     var act_func = act_handler[actKey];
     if (act_func) {
-        var targetHeros = gameutils.getAliveHeros(roomInfo.seats, targetIds);
+        var targetHeros = gameutils.getAliveHeros(room_seats, targetIds);
         for (var i = 0; i < targetHeros.length; i++) {
             act_func(now_act_hero, targetHeros[i]);
         }
     }
-    gameutils.moveToNextHero(roomInfo.seats);
-    sendActResult(roomInfo.seats,actInfo);
+
+    var one_side_fail = null;
+    for (var i = 0; i < room_seats.length; i++) {
+        if (getAliveHeros(room_seats[i].heros).length === 0) {
+            one_side_fail = i;
+            break
+        }
+    }
+    var game_over_data = one_side_fail ? {
+        winner: one_side_fail == 0 ? 1 : 0,
+        losser: one_side_fail
+    } : null;
+
+    if (!one_side_fail) {
+        gameutils.moveToNextHero(room_seats);
+    }
+    sendActResult(room_seats, actInfo, game_over_data);
 }
 
 exports.chuPai = function (userId, pai) {
