@@ -299,6 +299,13 @@ cc.Class({
         // })
     },
 
+    get_group: function(){
+        if(!this.m_all_heros){
+            return;
+        }
+        return this.m_all_heros[0].group;
+    },
+
     // called every frame, uncomment this function to activate update callback
     update: function (dt) {
         if (this._lastChatTime > 0) {

@@ -52,13 +52,13 @@ cc.Class({
 
         var btnWechat = cc.find("Canvas/zouziBtn");
         if (btnWechat) {
-            cc.vv.utils.addClickEvent(btnWechat, this.node, "ChessGame", "zouzi_test");
+            cc.vv.utils.addClickEvent(btnWechat, this.node, "ChessGame", "ui_test");
         }
 
         this.test_hero();
     },
     test_hero() {
-        cc.vv.net.send('queryhero');
+        // cc.vv.net.send('queryhero');
         // cc.vv.utils.addClickEvent(cc.find("Canvas/heroroot/atk"), this.node, "ChessGame", "atk_test");
     },
     atk_test() {
@@ -68,12 +68,15 @@ cc.Class({
         let np = self_hero.convertToNodeSpaceAR(wp)
         this._seats[0]._heroArr[0].getComponent('hero').attack(cc.v2(np.x, np.y));
     },
-    zouzi_test() {
-        let data = {
-            start: { hang: 0, lie: 0 },
-            end: { hang: 1, lie: 0 },
-        }
-        cc.vv.net.send("zouzi", JSON.stringify(data));
+    ui_test() {
+        // let data = {
+        //     start: { hang: 0, lie: 0 },
+        //     end: { hang: 1, lie: 0 },
+        // }
+        // cc.vv.net.send("zouzi", JSON.stringify(data));
+        this.show_game_over({
+            winner: '0',
+        });
     },
     initView() {
         //搜索需要的子节点
@@ -395,12 +398,18 @@ cc.Class({
     show_game_over: function (game_over_data) {
         let gameoverPanel = this.m_gameoverPanel;
         if (!gameoverPanel) {
-            gameoverPanel = loader_mgr.get_inst().loadPrefabObjSync('sg/prefabs/opt_dialog');
+            gameoverPanel = loader_mgr.get_inst().loadPrefabObjSync('sg/prefabs/gameoverpanel');
             gameoverPanel.parent = this.node.getChildByName("game_opt_root")
             this.m_gameoverPanel = gameoverPanel;
         }
-
-        gameoverPanel.active = !!hero_data;
+        let t_group =  cc.vv.gameNetMgr.seatIndex;
+        gameoverPanel.active = !!game_over_data;
+        if(game_over_data){
+            let is_success = parseInt( game_over_data.winner ) === t_group;
+            gameoverPanel.getComponent('roundgaemover').setData({
+                success: is_success
+            });
+        }
     },
 
     checkIp: function () {

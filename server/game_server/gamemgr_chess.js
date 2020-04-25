@@ -884,24 +884,10 @@ function doGameOver(game, userId, forceEnd) {
     }
 
     var results = [];
-    var dbresult = [0, 0, 0, 0];
+    var dbresult = [0, 0];
 
     var fnNoticeResult = function (isEnd) {
-        var endinfo = null;
-        if (isEnd) {
-            endinfo = [];
-            for (var i = 0; i < roomInfo.seats.length; ++i) {
-                var rs = roomInfo.seats[i];
-                endinfo.push({
-                    numzimo: rs.numZiMo,
-                    numjiepao: rs.numJiePao,
-                    numdianpao: rs.numDianPao,
-                    numangang: rs.numAnGang,
-                    numminggang: rs.numMingGang,
-                    numchadajiao: rs.numChaJiao,
-                });
-            }
-        }
+        var endinfo = "just end";
         userMgr.broacastInRoom('game_over_push', { results: results, endinfo: endinfo }, userId, true);
         //如果局数已够，则进行整体结算，并关闭房间
         if (isEnd) {
@@ -918,74 +904,74 @@ function doGameOver(game, userId, forceEnd) {
     }
 
     if (game != null) {
-        if (!forceEnd) {
-            calculateResult(game, roomInfo);
-        }
+        // if (!forceEnd) {
+        //     calculateResult(game, roomInfo);
+        // }
 
         for (var i = 0; i < roomInfo.seats.length; ++i) {
             var rs = roomInfo.seats[i];
             var sd = game.gameSeats[i];
 
             rs.ready = false;
-            rs.score += sd.score;
-            rs.numZiMo += sd.numZiMo;
-            rs.numJiePao += sd.numJiePao;
-            rs.numDianPao += sd.numDianPao;
-            rs.numAnGang += sd.numAnGang;
-            rs.numMingGang += sd.numMingGang;
-            rs.numChaJiao += sd.numChaJiao;
+            // rs.score += sd.score;
+            // rs.numZiMo += sd.numZiMo;
+            // rs.numJiePao += sd.numJiePao;
+            // rs.numDianPao += sd.numDianPao;
+            // rs.numAnGang += sd.numAnGang;
+            // rs.numMingGang += sd.numMingGang;
+            // rs.numChaJiao += sd.numChaJiao;
 
             var userRT = {
                 userId: sd.userId,
                 pengs: sd.pengs,
                 actions: [],
-                wangangs: sd.wangangs,
-                diangangs: sd.diangangs,
-                angangs: sd.angangs,
-                numofgen: sd.numofgen,
-                holds: sd.holds,
-                fan: sd.fan,
-                score: sd.score,
-                totalscore: rs.score,
-                qingyise: sd.qingyise,
-                pattern: sd.pattern,
-                isganghu: sd.isGangHu,
-                menqing: sd.isMenQing,
-                zhongzhang: sd.isZhongZhang,
-                jingouhu: sd.isJinGouHu,
-                haidihu: sd.isHaiDiHu,
-                tianhu: sd.isTianHu,
-                dihu: sd.isDiHu,
-                huorder: game.hupaiList.indexOf(i),
+                // wangangs: sd.wangangs,
+                // diangangs: sd.diangangs,
+                // angangs: sd.angangs,
+                // numofgen: sd.numofgen,
+                // holds: sd.holds,
+                // fan: sd.fan,
+                // score: sd.score,
+                // totalscore: rs.score,
+                // qingyise: sd.qingyise,
+                // pattern: sd.pattern,
+                // isganghu: sd.isGangHu,
+                // menqing: sd.isMenQing,
+                // zhongzhang: sd.isZhongZhang,
+                // jingouhu: sd.isJinGouHu,
+                // haidihu: sd.isHaiDiHu,
+                // tianhu: sd.isTianHu,
+                // dihu: sd.isDiHu,
+                // huorder: game.hupaiList.indexOf(i),
             };
 
-            for (var k in sd.actions) {
-                userRT.actions[k] = {
-                    type: sd.actions[k].type,
-                };
-            }
-            results.push(userRT);
+            // for (var k in sd.actions) {
+            //     userRT.actions[k] = {
+            //         type: sd.actions[k].type,
+            //     };
+            // }
+            // results.push(userRT);
 
 
-            dbresult[i] = sd.score;
+            dbresult[i] = 0;
             delete gameSeatsOfUsers[sd.userId];
         }
         delete games[roomId];
 
-        var old = roomInfo.nextButton;
-        if (game.yipaoduoxiang >= 0) {
-            roomInfo.nextButton = game.yipaoduoxiang;
-        }
-        else if (game.firstHupai >= 0) {
-            roomInfo.nextButton = game.firstHupai;
-        }
-        else {
-            roomInfo.nextButton = (game.turn + 1) % GameSeatNum;
-        }
+        // var old = roomInfo.nextButton;
+        // if (game.yipaoduoxiang >= 0) {
+        //     roomInfo.nextButton = game.yipaoduoxiang;
+        // }
+        // else if (game.firstHupai >= 0) {
+        //     roomInfo.nextButton = game.firstHupai;
+        // }
+        // else {
+        //     roomInfo.nextButton = (game.turn + 1) % GameSeatNum;
+        // }
 
-        if (old != roomInfo.nextButton) {
-            db.update_next_button(roomId, roomInfo.nextButton);
-        }
+        // if (old != roomInfo.nextButton) {
+        //     db.update_next_button(roomId, roomInfo.nextButton);
+        // }
     }
 
     if (forceEnd || game == null) {
@@ -995,26 +981,27 @@ function doGameOver(game, userId, forceEnd) {
         //保存游戏
         store_game(game, function (ret) {
 
+            // 此结果为经验或者得到的奖励
             db.update_game_result(roomInfo.uuid, game.gameIndex, dbresult);
 
-            //记录打牌信息
+            //记录游戏回合
             var str = JSON.stringify(game.actionList);
             db.update_game_action_records(roomInfo.uuid, game.gameIndex, str);
 
             //保存游戏局数
-            db.update_num_of_turns(roomId, roomInfo.numOfGames);
+            // db.update_num_of_turns(roomId, roomInfo.numOfGames);
 
             //如果是第一次，并且不是强制解散 则扣除房卡
-            if (roomInfo.numOfGames == 1) {
-                var cost = 2;
-                if (roomInfo.conf.maxGames == 8) {
-                    cost = 3;
-                }
-                db.cost_gems(game.gameSeats[0].userId, cost);
-            }
+            // if (roomInfo.numOfGames == 1) {
+            //     var cost = 2;
+            //     if (roomInfo.conf.maxGames == 8) {
+            //         cost = 3;
+            //     }
+            //     db.cost_gems(game.gameSeats[0].userId, cost);
+            // }
 
-            var isEnd = (roomInfo.numOfGames >= roomInfo.conf.maxGames);
-            fnNoticeResult(isEnd);
+            // var isEnd = (roomInfo.numOfGames >= roomInfo.conf.maxGames);
+            fnNoticeResult(true);
         });
     }
 }
@@ -1042,12 +1029,8 @@ function recordUserAction(game, seatData, type, target) {
     return d;
 }
 
-function recordGameAction(game, si, action, pai) {
-    game.actionList.push(si);
+function recordGameAction(game, action) {
     game.actionList.push(action);
-    if (pai != null) {
-        game.actionList.push(pai);
-    }
 }
 
 function sendActResult(seats, actInfo, game_over_data) {
@@ -1056,16 +1039,6 @@ function sendActResult(seats, actInfo, game_over_data) {
         var s = seats[i];
         userMgr.sendMsg(s.userId, 'act_result', { seats: trim_seats, actInfo: actInfo, game_over_data: game_over_data });
     }
-}
-
-function get_aliveHeros(heros) {
-    if (table.isEmpty(heros)) {
-        return [];
-    }
-
-    return table.findAll(heros, function (cur) {
-        return cur.curhp > 0;
-    })
 }
 
 exports.setReady = function (userId) {
@@ -1500,11 +1473,12 @@ exports.heroAct = function (userId, actInfo) {
         for (var i = 0; i < targetHeros.length; i++) {
             act_func(now_act_hero, targetHeros[i]);
         }
+        recordGameAction({actInfo:actInfo,heros:[room_seats[0].heros,room_seats[1].heros]});
     }
 
     var one_side_fail = null;
     for (var i = 0; i < room_seats.length; i++) {
-        if (getAliveHeros(room_seats[i].heros).length === 0) {
+        if (gameutils.getAliveHerosFromOnesizeHeroArr(room_seats[i].heros).length === 0) {
             one_side_fail = i;
             break
         }
@@ -2253,32 +2227,6 @@ exports.dissolveAgree = function (roomId, userId, agree) {
     }
     return roomInfo;
 };
-
-
-//象棋逻辑
-exports.move = function (userId, start_p, end_p) {
-    // var game = getGameByUserID(userId);
-    // if(!game){
-    //     return;
-    // }
-
-    // var chessArray = game.chessArray;
-    // if(!chessArray){
-    //     return;
-    // }
-
-    // var startIndex = chessutils.hanglie2index(start_p.hang,start_p.lie);
-    // var endIndex = chessutils.hanglie2index(end_p.hang,end_p.lie);
-    // chessArray[endIndex] = chessArray[startIndex];
-    // chessArray[startIndex] = 0;
-
-    // userMgr.broacastInRoom('chess_move',{chessArray:chessArray},userId,true);
-}
-
-//同意开始
-exports.agree_start = function (userId, isAgree) {
-
-}
 
 function update() {
     for (var i = dissolvingList.length - 1; i >= 0; --i) {

@@ -114,6 +114,16 @@ exports.getAliveHeros = function (seats, targetIds) {
     return res;
 }
 
+exports.getAliveHerosFromOnesizeHeroArr = function(heros) {
+    if (table.isEmpty(heros)) {
+        return [];
+    }
+
+    return table.findAll(heros, function (cur) {
+        return cur.curhp > 0;
+    })
+}
+
 exports.updateRoundInitSpd = function (hero_arr) {
     // 按速度排序
     hero_arr.sort(function (f, s) {
