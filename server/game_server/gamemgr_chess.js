@@ -898,7 +898,7 @@ function doGameOver(game, userId, forceEnd) {
 
                 userMgr.kickAllInRoom(roomId);
                 roomMgr.destroy(roomId);
-                db.archive_games(roomInfo.uuid);
+                // db.archive_games(roomInfo.uuid);
             }, 1500);
         }
     }
@@ -1027,6 +1027,25 @@ function recordUserAction(game, seatData, type, target) {
 
     seatData.actions.push(d);
     return d;
+}
+
+//只选取必要的信息存储
+function trimHeroData(heros) {
+    var res = [];
+    for (var j = 0; j < heros.length; j++) {
+        var t_hero = heros[j];
+        res.push({
+            id: t_hero.id,
+            uuid: t_hero.uuid,
+            name: t_hero.name,
+            curhp: t_hero.curhp,
+            mp: t_hero.mp,
+            curmp: t_hero.curmp,
+            lv: t_hero.lv,
+            act_state: t_hero.act_state,
+        })
+    }
+    return res;
 }
 
 function recordGameAction(game, action) {
@@ -1213,6 +1232,7 @@ exports.begin = function (roomId) {
 
         currentIndex: 0,
         gameSeats: new Array(GameSeatNum),
+        actionList: []
     };
 
     roomInfo.numOfGames++;
@@ -1465,6 +1485,11 @@ exports.heroAct = function (userId, actInfo) {
         return;
     }
 
+    var game = games[roomId];
+    if (!game) {
+        return;
+    }
+
     var targetIds = actInfo.targetIds;
     var actKey = actInfo.actKey;
     var act_func = act_handler[actKey];
@@ -1473,7 +1498,7 @@ exports.heroAct = function (userId, actInfo) {
         for (var i = 0; i < targetHeros.length; i++) {
             act_func(now_act_hero, targetHeros[i]);
         }
-        recordGameAction({actInfo:actInfo,heros:[room_seats[0].heros,room_seats[1].heros]});
+        recordGameAction(game, { actInfo: actInfo, heros: [trimHeroData(room_seats[0].heros), trimHeroData(room_seats[1].heros)] });
     }
 
     var one_side_fail = null;
@@ -1492,6 +1517,10 @@ exports.heroAct = function (userId, actInfo) {
         gameutils.moveToNextHero(room_seats);
     }
     sendActResult(room_seats, actInfo, game_over_data);
+    if (game_over_data) {
+        var game = games[roomId];
+        doGameOver(game, userId);
+    }
 }
 
 exports.chuPai = function (userId, pai) {
