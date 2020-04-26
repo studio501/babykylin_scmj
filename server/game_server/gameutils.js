@@ -133,3 +133,18 @@ exports.updateRoundInitSpd = function (hero_arr) {
         hero_arr[i].roundspd = i + 1;
     }
 }
+
+exports.tell_hero_group = function(seats,hero){
+    if(!seats || !hero){
+        return null;
+    }
+
+    for(var i=0;i<seats.length;i++){
+        for(var j=0;j<seats[i].heros.length;i++){
+            if(seats[i].heros[j] === hero){
+                return i;
+            }
+        }
+    }
+    return null;
+}

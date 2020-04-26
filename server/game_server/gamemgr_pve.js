@@ -184,6 +184,24 @@ function sendActResult(seats, actInfo, game_over_data) {
     }
 }
 
+
+function gen_npc(){
+    return {
+        id: "33",
+        uuid: "33xxvcae",
+        name: "打手",
+        hp: 30,
+        curhp: 30,
+        mp: 4,
+        curmp: 4,
+        atk: 10,
+        def: 10,
+        spd: 2,
+        lv: 1,
+        exp: 0
+    };
+}
+
 exports.setReady = function (userId) {
     var roomId = roomMgr.getUserRoom(userId);
     if (roomId == null) {
@@ -201,12 +219,18 @@ exports.setReady = function (userId) {
     var game = games[roomId];
     if (game == null) {
         if (roomInfo.seats.length == GameSeatNum) {
-            for (var i = 0; i < roomInfo.seats.length; ++i) {
-                var s = roomInfo.seats[i];
-                if (s.ready == false || userMgr.isOnline(s.userId) == false) {
-                    return;
-                }
+            // for (var i = 0; i < roomInfo.seats.length; ++i) {
+            //     var s = roomInfo.seats[i];
+            //     if (s.ready == false || userMgr.isOnline(s.userId) == false) {
+
+            //         return;
+            //     }
+            // }
+            var npcs = [];
+            for(var i=0;i<3;i++){
+                npcs.push(gen_npc());
             }
+            roomInfo.seats[1].heros = npcs;
             //GameSeatNum个人到齐了，并且都准备好了，则开始新的一局
             exports.begin(roomId);
         }
@@ -345,7 +369,7 @@ exports.begin = function (roomId) {
     games[roomId] = game;
 
     gameutils.updateRoundInitSpd(hero_arr);
-    gameutils.moveToNextHero(seats);
+    let hero_sortby_spd = gameutils.moveToNextHero(seats);
     var trim_seats = table.trimTbl(seats, ["heros"]);
     for (var i = 0; i < seats.length; ++i) {
         //开局时，通知前端必要的数据
