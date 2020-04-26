@@ -112,7 +112,7 @@ cc.Class({
         }
         conf.type = type;
         conf = {};
-        conf.type = "chess";
+        conf.type = "pvp";
 
         var data = {
             account: cc.vv.userMgr.account,
@@ -137,17 +137,17 @@ cc.Class({
         var zuidafanshu = this.getSelectedOfRadioGroup('zuidafanshu');
         var jushuxuanze = this.getSelectedOfRadioGroup('xuanzejushu');
         var dianganghua = this.getSelectedOfRadioGroup('dianganghua');
-        
+
         var conf = {
-            difen:difen,
-            zimo:zimo,
-            jiangdui:jiangdui,
-            huansanzhang:huansanzhang,
-            zuidafanshu:zuidafanshu,
-            jushuxuanze:jushuxuanze,
-            dianganghua:dianganghua,
-            menqing:menqing,
-            tiandihu:tiandihu,   
+            difen: difen,
+            zimo: zimo,
+            jiangdui: jiangdui,
+            huansanzhang: huansanzhang,
+            zuidafanshu: zuidafanshu,
+            jushuxuanze: jushuxuanze,
+            dianganghua: dianganghua,
+            menqing: menqing,
+            tiandihu: tiandihu,
         };
         return conf;
     },

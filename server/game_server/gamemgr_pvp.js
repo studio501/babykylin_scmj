@@ -430,89 +430,22 @@ exports.hasBegan = function (roomId) {
     return false;
 };
 
-
-var dissolvingList = [];
-
-exports.doDissolve = function (roomId) {
-    var roomInfo = roomMgr.getRoom(roomId);
-    if (roomInfo == null) {
-        return null;
-    }
-
-    var game = games[roomId];
-    doGameOver(game, roomInfo.seats[0].userId, true);
-};
-
-exports.dissolveRequest = function (roomId, userId) {
-    var roomInfo = roomMgr.getRoom(roomId);
-    if (roomInfo == null) {
-        return null;
-    }
-
-    if (roomInfo.dr != null) {
-        return null;
-    }
-
-    var seatIndex = roomMgr.getUserSeat(userId);
-    if (seatIndex == null) {
-        return null;
-    }
-
-    roomInfo.dr = {
-        endTime: Date.now() + 30000,
-        states: [false, false, false, false]
-    };
-    roomInfo.dr.states[seatIndex] = true;
-
-    dissolvingList.push(roomId);
-
-    return roomInfo;
-};
-
-exports.dissolveAgree = function (roomId, userId, agree) {
-    var roomInfo = roomMgr.getRoom(roomId);
-    if (roomInfo == null) {
-        return null;
-    }
-
-    if (roomInfo.dr == null) {
-        return null;
-    }
-
-    var seatIndex = roomMgr.getUserSeat(userId);
-    if (seatIndex == null) {
-        return null;
-    }
-
-    if (agree) {
-        roomInfo.dr.states[seatIndex] = true;
-    }
-    else {
-        roomInfo.dr = null;
-        var idx = dissolvingList.indexOf(roomId);
-        if (idx != -1) {
-            dissolvingList.splice(idx, 1);
-        }
-    }
-    return roomInfo;
-};
-
 function update() {
-    for (var i = dissolvingList.length - 1; i >= 0; --i) {
-        var roomId = dissolvingList[i];
+    // for (var i = dissolvingList.length - 1; i >= 0; --i) {
+    //     var roomId = dissolvingList[i];
 
-        var roomInfo = roomMgr.getRoom(roomId);
-        if (roomInfo != null && roomInfo.dr != null) {
-            if (Date.now() > roomInfo.dr.endTime) {
-                console.log("delete room and games");
-                exports.doDissolve(roomId);
-                dissolvingList.splice(i, 1);
-            }
-        }
-        else {
-            dissolvingList.splice(i, 1);
-        }
-    }
+    //     var roomInfo = roomMgr.getRoom(roomId);
+    //     if (roomInfo != null && roomInfo.dr != null) {
+    //         if (Date.now() > roomInfo.dr.endTime) {
+    //             console.log("delete room and games");
+    //             exports.doDissolve(roomId);
+    //             dissolvingList.splice(i, 1);
+    //         }
+    //     }
+    //     else {
+    //         dissolvingList.splice(i, 1);
+    //     }
+    // }
 }
 
 setInterval(update, 1000);

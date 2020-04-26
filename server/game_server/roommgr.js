@@ -11,6 +11,8 @@ var MAX_FAN = [3, 4, 5];
 var JU_SHU = [4, 8];
 var JU_SHU_COST = [2, 3];
 
+const SeatNum = 2;
+
 function generateRoomId() {
 	var roomId = "";
 	for (var i = 0; i < 6; ++i) {
@@ -22,7 +24,7 @@ function generateRoomId() {
 function constructRoomFromDb(dbdata) {
 	var conf = JSON.parse(dbdata.base_info);
 	var game_type = conf.type;
-	var seat_num = game_type == "chess" ? 2 : 4;
+	var seat_num = SeatNum;
 	var roomInfo = {
 		uuid: dbdata.uuid,
 		id: dbdata.id,
@@ -40,11 +42,13 @@ function constructRoomFromDb(dbdata) {
 	else if (roomInfo.conf.type == "xzdd") {
 		roomInfo.gameMgr = require("./gamemgr_xzdd");
 	}
-	else if (roomInfo.conf.type == "chess") {
-		roomInfo.gameMgr = require("./gamemgr_chess");
+	else if (roomInfo.conf.type == "pvp") {
+		roomInfo.gameMgr = require("./gamemgr_pvp");
+	}
+	else if (roomInfo.conf.type == "pve") {
+		roomInfo.gameMgr = require("./gamemgr_pve");
 	}
 	var roomId = roomInfo.id;
-	var seat_num = roomInfo.conf.type == "chess" ? 2 : 4;
 
 	for (var i = 0; i < seat_num; ++i) {
 		var s = roomInfo.seats[i] = {};
@@ -53,12 +57,6 @@ function constructRoomFromDb(dbdata) {
 		s.name = dbdata["user_name" + i];
 		s.ready = false;
 		s.seatIndex = i;
-		s.numZiMo = 0;
-		s.numJiePao = 0;
-		s.numDianPao = 0;
-		s.numAnGang = 0;
-		s.numMingGang = 0;
-		s.numChaJiao = 0;
 
 		if (s.userId > 0) {
 			userLocation[s.userId] = {
@@ -112,11 +110,14 @@ exports.createRoom = function (creator, roomConf, gems, ip, port, callback) {
 					else if (roomConf.type == "xzdd") {
 						roomInfo.gameMgr = require("./gamemgr_xzdd");
 					}
-					else if (roomConf.type == "chess") {
-						roomInfo.gameMgr = require("./gamemgr_chess");
+					else if (roomConf.type == "pvp") {
+						roomInfo.gameMgr = require("./gamemgr_pvp");
+					}
+					else if (roomConf.type == "pve") {
+						roomInfo.gameMgr = require("./gamemgr_pve");
 					}
 					// console.log(roomInfo.conf);
-					var seat_num = roomConf.type == "chess" ? 2 : 4;
+					var seat_num = SeatNum;
 					for (var i = 0; i < seat_num; ++i) {
 						roomInfo.seats.push({
 							userId: 0,

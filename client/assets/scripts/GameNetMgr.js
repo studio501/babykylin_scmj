@@ -223,7 +223,8 @@ cc.Class({
 
         cc.vv.net.addHandler("login_finished", function (data) {
             console.log("login_finished");
-            let scene_name = self.conf.type === "chess" ? 'chessgame' : 'mjgame'
+            let scene_name = "chessgame";
+            // self.conf.type === "chess" ? 'chessgame' : 'mjgame'
             cc.view.setOrientation(cc.macro.ORIENTATION_PORTRAIT)
             loader_mgr.get_inst().loadPrefabDir("sg/prefabs", gen_handler(function () {
                 cc.director.loadScene(scene_name, function () {
