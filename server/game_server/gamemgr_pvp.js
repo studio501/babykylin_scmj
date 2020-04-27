@@ -430,6 +430,10 @@ exports.hasBegan = function (roomId) {
     return false;
 };
 
+exports.battleReady = function (userId) {
+
+}
+
 function update() {
     // for (var i = dissolvingList.length - 1; i >= 0; --i) {
     //     var roomId = dissolvingList[i];

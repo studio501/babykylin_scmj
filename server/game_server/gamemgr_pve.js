@@ -176,16 +176,16 @@ function recordGameAction(game, action) {
     game.actionList.push(action);
 }
 
-function sendActResult(seats, actInfo, game_over_data) {
+function sendActResult(seats, round_data, game_over_data) {
     var trim_seats = table.trimTbl(seats, ["heros"]);
-    for (var i = 0; i < seats.length; ++i) {
+    for (var i = 0; 1; ++i) {
         var s = seats[i];
-        userMgr.sendMsg(s.userId, 'act_result', { seats: trim_seats, actInfo: actInfo, game_over_data: game_over_data });
+        userMgr.sendMsg(s.userId, 'act_result_npc', { seats: trim_seats, round_data: round_data, game_over_data: game_over_data });
     }
 }
 
 
-function gen_npc(){
+function gen_npc() {
     return {
         id: "33",
         uuid: "33xxvcae",
@@ -200,6 +200,15 @@ function gen_npc(){
         lv: 1,
         exp: 0
     };
+}
+
+function npc_act(seats, npc) {
+    var send_data = {
+        srcId: npc.id,
+        targetIds: [gameutils.random_hero(seats[0].heros).id],
+        actKey: "normal_attack"
+    }
+    return send_data
 }
 
 exports.setReady = function (userId) {
@@ -219,19 +228,11 @@ exports.setReady = function (userId) {
     var game = games[roomId];
     if (game == null) {
         if (roomInfo.seats.length == GameSeatNum) {
-            // for (var i = 0; i < roomInfo.seats.length; ++i) {
-            //     var s = roomInfo.seats[i];
-            //     if (s.ready == false || userMgr.isOnline(s.userId) == false) {
-
-            //         return;
-            //     }
-            // }
             var npcs = [];
-            for(var i=0;i<3;i++){
+            for (var i = 0; i < 1; i++) {
                 npcs.push(gen_npc());
             }
             roomInfo.seats[1].heros = npcs;
-            //GameSeatNum个人到齐了，并且都准备好了，则开始新的一局
             exports.begin(roomId);
         }
     }
@@ -262,13 +263,17 @@ exports.setReady = function (userId) {
         }
 
 
-        gameutils.initActHeroOrder(data.seats);
-
-        for (var i = 0; i < data.seats.length; ++i) {
+        // var hero_sortby_spd = gameutils.initActHeroOrder(data.seats);
+        // var actInfo = null;
+        // if (hero_sortby_spd && gameutils.tell_hero_group(data.seats, hero_sortby_spd[0]) === 1) {
+        //     actInfo = npc_act(data.seats, hero_sortby_spd[0]);
+        //     data.actInfo = actInfo;
+        // }
+        for (var i = 0; i < 1; ++i) {
             var s = data.seats[i];
             userMgr.sendMsg(s.userid, 'game_sync_push', data);
         }
-        sendOperations(game, seatData, game.chuPai);
+        // sendOperations(game, seatData, game.chuPai);
     }
 }
 
@@ -369,13 +374,17 @@ exports.begin = function (roomId) {
     games[roomId] = game;
 
     gameutils.updateRoundInitSpd(hero_arr);
-    let hero_sortby_spd = gameutils.moveToNextHero(seats);
+    // var hero_sortby_spd = gameutils.moveToNextHero(seats);
+    // var actInfo = null;
+    // if (hero_sortby_spd && gameutils.tell_hero_group(seats, hero_sortby_spd[0]) === 1) {
+    //     actInfo = npc_act(seats, hero_sortby_spd[0]);
+    // }
     var trim_seats = table.trimTbl(seats, ["heros"]);
-    for (var i = 0; i < seats.length; ++i) {
+    for (var i = 0; i < 1; ++i) {
         //开局时，通知前端必要的数据
         var s = seats[i];
         //通知游戏开始
-        userMgr.sendMsg(s.userId, 'game_begin_push', { seats: trim_seats });
+        userMgr.sendMsg(s.userId, 'game_begin_push', { seats: trim_seats, actInfo: actInfo });
     }
 };
 
@@ -393,36 +402,78 @@ exports.heroAct = function (userId, actInfo) {
         return;
     }
 
-    var room_seats = roomInfo.seats;
-    var now_act_hero = gameutils.getNowActHero(room_seats);
-    if (table.isEmpty(now_act_hero)) {
-        return;
-    }
-
-    var srcId = actInfo.srcId;
-    if (srcId !== now_act_hero.id) {
-        return;
-    }
-
     var game = games[roomId];
     if (!game) {
         return;
     }
 
-    var targetIds = actInfo.targetIds;
-    var actKey = actInfo.actKey;
-    var act_func = act_handler[actKey];
-    if (act_func) {
-        var targetHeros = gameutils.getAliveHeros(room_seats, targetIds);
-        for (var i = 0; i < targetHeros.length; i++) {
-            act_func(now_act_hero, targetHeros[i]);
+    var room_seats = roomInfo.seats;
+    var player_seat = room_seats[0];
+    var npc_seat = room_seats[1];
+
+    var s1_hero_num = player_seat.heros.length;
+    var s2_hero_num = npc_seat.heros.length;
+    var round_data = [];
+    for (var i = 0; i < s1_hero_num + s2_hero_num; i++) {
+        var now_act_hero = gameutils.getNowActHero(room_seats);
+        if (table.isEmpty(now_act_hero)) {
+            break;
         }
-        recordGameAction(game, { actInfo: actInfo, heros: [trimHeroData(room_seats[0].heros), trimHeroData(room_seats[1].heros)] });
+
+        var is_npc = gameutils.tell_hero_group(room_seats, now_act_hero) === 1;
+        var srcId = now_act_hero.id;
+        var targetIds = null;
+        var actKey = null;
+        if (is_npc) {
+            var player_alive_heros = gameutils.getAliveHerosFromOnesideHeroArr(player_seat.heros);
+            if (table.isEmpty(player_alive_heros)) {
+                break;
+            }
+
+            targetIds = [gameutils.random_hero(player_alive_heros).id];
+            actKey = "normal_attack";
+        } else {
+            var npc_alive_heros = gameutils.getAliveHerosFromOnesideHeroArr(npc_seat.heros);
+            if (table.isEmpty(npc_alive_heros)) {
+                break;
+            }
+
+            var find_act_hero = table.find(actInfo, function (cur) {
+                return cur.srcId === now_act_hero.id;
+            })
+            if (find_act_hero) {
+                var tmp_alives = gameutils.getAliveHeros(room_seats, find_act_hero.targetIds);
+                targetIds = table.filterKey(tmp_alives, "id");
+                actKey = find_act_hero.actKey;
+            }
+        }
+        if (!targetIds || !actKey) {
+            break;
+        }
+        // var targetIds = actInfo.targetIds;
+        // var actKey = actInfo.actKey;
+        var tmpInfo = {
+            srcId: srcId,
+            targetIds: targetIds,
+            actKey: actKey,
+        }
+        var act_func = act_handler[actKey];
+        if (act_func) {
+            var targetHeros = gameutils.getAliveHeros(room_seats, targetIds);
+            for (var i = 0; i < targetHeros.length; i++) {
+                act_func(now_act_hero, targetHeros[i]);
+            }
+            var t = { actInfo: tmpInfo, heros: [trimHeroData(room_seats[0].heros), trimHeroData(room_seats[1].heros)] };
+            round_data.push(t)
+            recordGameAction(game, t);
+        }
+
+        gameutils.moveToNextHero(room_seats);
     }
 
     var one_side_fail = null;
     for (var i = 0; i < room_seats.length; i++) {
-        if (gameutils.getAliveHerosFromOnesizeHeroArr(room_seats[i].heros).length === 0) {
+        if (gameutils.getAliveHerosFromOnesideHeroArr(room_seats[i].heros).length === 0) {
             one_side_fail = i;
             break
         }
@@ -432,10 +483,10 @@ exports.heroAct = function (userId, actInfo) {
         losser: one_side_fail
     } : null;
 
-    if (!one_side_fail) {
-        gameutils.moveToNextHero(room_seats);
-    }
-    sendActResult(room_seats, actInfo, game_over_data);
+    // if (!one_side_fail) {
+    //     gameutils.moveToNextHero(room_seats);
+    // }
+    sendActResult(room_seats, round_data, game_over_data);
     if (game_over_data) {
         var game = games[roomId];
         doGameOver(game, userId);
@@ -453,6 +504,10 @@ exports.hasBegan = function (roomId) {
     }
     return false;
 };
+
+exports.battleReady = function (userId) {
+
+}
 
 function update() {
     // for (var i = dissolvingList.length - 1; i >= 0; --i) {

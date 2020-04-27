@@ -154,6 +154,13 @@ exports.start = function (conf, mgr) {
 			})
 		});
 
+		socket.on('battleReady', function () {
+			if (!socket.userId) {
+				return;
+			}
+			socket.gameMgr.battleReady(socket.userId);
+		});
+
 		socket.on('heroAct', function (actData) {
 			if (!socket.userId) {
 				return;

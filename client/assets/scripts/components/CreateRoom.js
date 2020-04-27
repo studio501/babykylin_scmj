@@ -36,7 +36,7 @@ cc.Class({
     },
 
     onBtnOK: function () {
-        var usedTypes = ['xzdd', 'xlch'];
+        var usedTypes = ['pvp', 'pve'];
         var type = this.getType();
         if (usedTypes.indexOf(type) == -1) {
             return;
@@ -55,12 +55,12 @@ cc.Class({
             }
         }
         if (type == 0) {
-            return 'xzdd';
+            return 'pvp';
         }
         else if (type == 1) {
-            return 'xlch';
+            return 'pve';
         }
-        return 'xzdd';
+        return 'pvp';
     },
 
     getSelectedOfRadioGroup(groupRoot) {
@@ -103,16 +103,14 @@ cc.Class({
         };
 
         var type = this.getType();
-        var conf = null;
-        if (type == 'xzdd') {
-            conf = this.constructSCMJConf();
-        }
-        else if (type == 'xlch') {
-            conf = this.constructSCMJConf();
-        }
+        var conf = {};
+        // if (type == 'xzdd') {
+        //     conf = this.constructSCMJConf();
+        // }
+        // else if (type == 'xlch') {
+        //     conf = this.constructSCMJConf();
+        // }
         conf.type = type;
-        conf = {};
-        conf.type = "pvp";
 
         var data = {
             account: cc.vv.userMgr.account,
@@ -139,15 +137,15 @@ cc.Class({
         var dianganghua = this.getSelectedOfRadioGroup('dianganghua');
 
         var conf = {
-            difen: difen,
-            zimo: zimo,
-            jiangdui: jiangdui,
-            huansanzhang: huansanzhang,
-            zuidafanshu: zuidafanshu,
-            jushuxuanze: jushuxuanze,
-            dianganghua: dianganghua,
-            menqing: menqing,
-            tiandihu: tiandihu,
+            // difen: difen,
+            // zimo: zimo,
+            // jiangdui: jiangdui,
+            // huansanzhang: huansanzhang,
+            // zuidafanshu: zuidafanshu,
+            // jushuxuanze: jushuxuanze,
+            // dianganghua: dianganghua,
+            // menqing: menqing,
+            // tiandihu: tiandihu,
         };
         return conf;
     },

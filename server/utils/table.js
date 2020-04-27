@@ -75,3 +75,19 @@ exports.trimTbl = function (tbl, trim_keys) {
     }
     return res;
 }
+
+exports.filterKey = function (tbl, trim_key) {
+    if (exports.isEmpty(tbl)) {
+        return [];
+    }
+
+    if (!trim_key || trim_key === '') {
+        return [];
+    }
+
+    var res = [];
+    for (var i = 0; i < tbl.length; i++) {
+        res.push(tbl[i][trim_key]);
+    }
+    return res;
+}

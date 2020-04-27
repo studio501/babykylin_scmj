@@ -114,7 +114,7 @@ exports.getAliveHeros = function (seats, targetIds) {
     return res;
 }
 
-exports.getAliveHerosFromOnesizeHeroArr = function(heros) {
+exports.getAliveHerosFromOnesideHeroArr = function (heros) {
     if (table.isEmpty(heros)) {
         return [];
     }
@@ -134,17 +134,21 @@ exports.updateRoundInitSpd = function (hero_arr) {
     }
 }
 
-exports.tell_hero_group = function(seats,hero){
-    if(!seats || !hero){
+exports.tell_hero_group = function (seats, hero) {
+    if (!seats || !hero) {
         return null;
     }
 
-    for(var i=0;i<seats.length;i++){
-        for(var j=0;j<seats[i].heros.length;i++){
-            if(seats[i].heros[j] === hero){
+    for (var i = 0; i < seats.length; i++) {
+        for (var j = 0; j < seats[i].heros.length; i++) {
+            if (seats[i].heros[j] === hero) {
                 return i;
             }
         }
     }
     return null;
+}
+
+exports.random_hero = function (heros) {
+    return heros[Math.floor(Math.random() * heros.length)];
 }
