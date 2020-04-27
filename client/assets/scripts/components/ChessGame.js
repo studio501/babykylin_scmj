@@ -229,6 +229,34 @@ cc.Class({
             })
         });
 
+        this.node.on('act_result_npc', function (data) {
+            if (!data || !data.round_data) {
+                return;
+            }
+            let round_data = data.round_data;
+            let ct = 0;
+            let fn = function(){
+                if(ct === round_data.length - 1){
+                    return;
+                }
+                let tr = data.round_data[ct++];
+                let actInfo = tr.actInfo;
+                let heros = tr.heros;
+
+                self.applyAtk(actInfo, function () {
+                    cc.vv.gameNetMgr.update_hero_data_inround(heros);
+                    self.initSeats();
+                    if (data.game_over_data) {
+                        self.show_game_over(data.game_over_data);
+                        return;
+                    }
+                    fn();
+                })
+            }
+            fn();
+            
+        });
+
         this.node.on('game_mopai', function (data) {
             self.hideChupai();
             var pai = data.pai;

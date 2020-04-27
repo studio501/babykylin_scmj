@@ -4,28 +4,49 @@ var utils = require('../utils/utils');
 var gameconst = require('./gameconst');
 var Hero_Act_State = gameconst.Hero_Act_State;
 
-exports.moveToNextHero = function (seats) {
-    return exports.initActHeroOrder(seats, true);
+exports.moveToNextHero = function (seats,index) {
+    return exports.initActHeroOrder(seats, true, index);
+}
+
+exports._get_aliveheros_by_seat = function(res,seat){
+    if (!table.isEmpty(seat.heros)) {
+        for (var j = 0; j < seat.heros.length; j++) {
+            var t_hero = seat.heros[j];
+            if (t_hero.curhp > 0) {
+                res.push(t_hero);
+            }
+            else {
+                t_hero.act_state = Hero_Act_State.UnableAct;
+            }
+        }
+    }
 }
 // 
-exports.initActHeroOrder = function (seats, moveToNext) {
+exports.initActHeroOrder = function (seats, moveToNext, index) {
     if (table.isEmpty(seats)) {
         return;
     }
     var res = [];
-    for (var i = 0; i < seats.length; i++) {
-        if (!table.isEmpty(seats[i].heros)) {
-            for (var j = 0; j < seats[i].heros.length; j++) {
-                var t_hero = seats[i].heros[j];
-                if (t_hero.curhp > 0) {
-                    res.push(t_hero);
-                }
-                else {
-                    t_hero.act_state = Hero_Act_State.UnableAct;
-                }
-            }
+    if(index === undefined){
+        for (var i = 0; i < seats.length; i++){
+            exports._get_aliveheros_by_seat(res,seats[i]);
         }
+    }else{
+        exports._get_aliveheros_by_seat(res,seats[index]);
     }
+    // for (var i = 0; i < seats.length; i++) {
+    //     if (!table.isEmpty(seats[i].heros)) {
+    //         for (var j = 0; j < seats[i].heros.length; j++) {
+    //             var t_hero = seats[i].heros[j];
+    //             if (t_hero.curhp > 0) {
+    //                 res.push(t_hero);
+    //             }
+    //             else {
+    //                 t_hero.act_state = Hero_Act_State.UnableAct;
+    //             }
+    //         }
+    //     }
+    // }
 
     // 确定初始化
     for (var i = 0; i < res.length; i++) {

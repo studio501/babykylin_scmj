@@ -178,7 +178,7 @@ function recordGameAction(game, action) {
 
 function sendActResult(seats, round_data, game_over_data) {
     var trim_seats = table.trimTbl(seats, ["heros"]);
-    for (var i = 0; 1; ++i) {
+    for (var i = 0; i < 1; ++i) {
         var s = seats[i];
         userMgr.sendMsg(s.userId, 'act_result_npc', { seats: trim_seats, round_data: round_data, game_over_data: game_over_data });
     }
@@ -263,7 +263,7 @@ exports.setReady = function (userId) {
         }
 
 
-        // var hero_sortby_spd = gameutils.initActHeroOrder(data.seats);
+        gameutils.initActHeroOrder(data.seats,false,0);
         // var actInfo = null;
         // if (hero_sortby_spd && gameutils.tell_hero_group(data.seats, hero_sortby_spd[0]) === 1) {
         //     actInfo = npc_act(data.seats, hero_sortby_spd[0]);
@@ -374,7 +374,7 @@ exports.begin = function (roomId) {
     games[roomId] = game;
 
     gameutils.updateRoundInitSpd(hero_arr);
-    // var hero_sortby_spd = gameutils.moveToNextHero(seats);
+    var hero_sortby_spd = gameutils.moveToNextHero(seats,0);
     // var actInfo = null;
     // if (hero_sortby_spd && gameutils.tell_hero_group(seats, hero_sortby_spd[0]) === 1) {
     //     actInfo = npc_act(seats, hero_sortby_spd[0]);
@@ -384,7 +384,7 @@ exports.begin = function (roomId) {
         //开局时，通知前端必要的数据
         var s = seats[i];
         //通知游戏开始
-        userMgr.sendMsg(s.userId, 'game_begin_push', { seats: trim_seats, actInfo: actInfo });
+        userMgr.sendMsg(s.userId, 'game_begin_push', { seats: trim_seats });
     }
 };
 
@@ -442,9 +442,9 @@ exports.heroAct = function (userId, actInfo) {
                 return cur.srcId === now_act_hero.id;
             })
             if (find_act_hero) {
-                var tmp_alives = gameutils.getAliveHeros(room_seats, find_act_hero.targetIds);
+                var tmp_alives = gameutils.getAliveHeros(room_seats, find_act_hero.value.targetIds);
                 targetIds = table.filterKey(tmp_alives, "id");
-                actKey = find_act_hero.actKey;
+                actKey = find_act_hero.value.actKey;
             }
         }
         if (!targetIds || !actKey) {

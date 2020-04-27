@@ -250,7 +250,7 @@ cc.Class({
             }
             cc.vv.mahjongmgr.accessAtkData(send_data);
             event_mgr.get_inst().fire(Event_Name.set_target_hero, null);
-            cc.vv.net.send("heroAct", send_data);
+            cc.vv.net.send("heroAct", [send_data]);
         }
 
 

@@ -1,5 +1,6 @@
 import { loader_mgr } from './base/loader/loader_mgr';
 import { handler, gen_handler } from "./base/util";
+const table = require("./table");
 const SeatNum = 2;
 cc.Class({
     extends: cc.Component,
@@ -182,6 +183,28 @@ cc.Class({
         }
     },
 
+    update_hero_data_inround(heros) {
+        if (!heros) {
+            return;
+        }
+        let self = this;
+        for (var i = 0; i < heros.length; i++) {
+            if (self.seats[i]) {
+                for (let j = 0; j < heros[i].length; j++) {
+                    let t_hero = heros[i][j];
+                    let tar_hero = table.find(self.seats[i].heros,function(cur){
+                        return cur.id === t_hero.id;
+                    })
+                    if(tar_hero){
+                        for(let k in t_hero){
+                            tar_hero.value[k] = t_hero[k];
+                        }
+                    }
+                }
+            }
+        }
+    },
+
     _update_hero_data(data) {
         var seatIndex = this.seatIndex;
         if (!data || seatIndex === undefined || seatIndex === null) {
@@ -356,6 +379,10 @@ cc.Class({
         cc.vv.net.addHandler("act_result", function (data) {
             self._update_hero_data(data);
             self.dispatchEvent('act_result', data);
+        });
+
+        cc.vv.net.addHandler("act_result_npc", function (data) {
+            self.dispatchEvent('act_result_npc', data);
         });
 
         cc.vv.net.addHandler("game_playing_push", function (data) {
