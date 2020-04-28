@@ -44,7 +44,7 @@ exports.findAll = function (tbl, func) {
     var res = [];
     for (var i = 0; i < tbl.length; i++) {
         if (func(tbl[i])) {
-            res.push({ value: tbl[i], key: i });
+            res.push(tbl[i]);
         }
     }
     return res;

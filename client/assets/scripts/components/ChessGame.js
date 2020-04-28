@@ -235,26 +235,40 @@ cc.Class({
             }
             let round_data = data.round_data;
             let ct = 0;
-            let fn = function(){
-                if(ct === round_data.length - 1){
+            let fn = null;
+            fn = function () {
+                if (ct === round_data.length) {
                     return;
                 }
                 let tr = data.round_data[ct++];
+                let last_round = ct === round_data.length;
                 let actInfo = tr.actInfo;
                 let heros = tr.heros;
 
                 self.applyAtk(actInfo, function () {
-                    cc.vv.gameNetMgr.update_hero_data_inround(heros);
-                    self.initSeats();
+                    cc.vv.gameNetMgr.update_hero_data_inround(heros, last_round);
+                    // self.initSeats();
+                    var seats = cc.vv.gameNetMgr.seats;
+                    console.log("self heros", table.trimTbl(seats[0].heros, ["curhp"]));
+                    console.log("npc heros", table.trimTbl(seats[1].heros, ["curhp"]));
+                    for (var i = 0; i < seats.length; ++i) {
+                        self._seats[i].setHeros(seats[i].heros);
+                    }
                     if (data.game_over_data) {
                         self.show_game_over(data.game_over_data);
                         return;
+                    } else {
+
                     }
-                    fn();
+                    if (last_round) {
+                        return;
+                    } else {
+                        fn();
+                    }
                 })
             }
             fn();
-            
+
         });
 
         this.node.on('game_mopai', function (data) {
@@ -430,10 +444,10 @@ cc.Class({
             gameoverPanel.parent = this.node.getChildByName("game_opt_root")
             this.m_gameoverPanel = gameoverPanel;
         }
-        let t_group =  cc.vv.gameNetMgr.seatIndex;
+        let t_group = cc.vv.gameNetMgr.seatIndex;
         gameoverPanel.active = !!game_over_data;
-        if(game_over_data){
-            let is_success = parseInt( game_over_data.winner ) === t_group;
+        if (game_over_data) {
+            let is_success = parseInt(game_over_data.winner) === t_group;
             gameoverPanel.getComponent('roundgaemover').setData({
                 success: is_success
             });

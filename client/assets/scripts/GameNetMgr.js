@@ -183,7 +183,7 @@ cc.Class({
         }
     },
 
-    update_hero_data_inround(heros) {
+    update_hero_data_inround(heros, last_round) {
         if (!heros) {
             return;
         }
@@ -192,15 +192,31 @@ cc.Class({
             if (self.seats[i]) {
                 for (let j = 0; j < heros[i].length; j++) {
                     let t_hero = heros[i][j];
-                    let tar_hero = table.find(self.seats[i].heros,function(cur){
+                    let tar_hero = table.find(self.seats[i].heros, function (cur) {
                         return cur.id === t_hero.id;
                     })
-                    if(tar_hero){
-                        for(let k in t_hero){
+                    if (tar_hero) {
+                        for (let k in t_hero) {
+                            if (k === "act_state" && t_hero[k] === 1) {
+                                t_hero[k] = 2;
+                            }
                             tar_hero.value[k] = t_hero[k];
                         }
                     }
                 }
+
+                if (i === 0 && last_round) {
+                    let alive_heros = table.findAll(self.seats[i].heros, function (cur) {
+                        return cur.curhp > 0;
+                    });
+                    alive_heros.sort(function (f, s) {
+                        return s.spd - f.spd;
+                    });
+                    if (!table.isEmpty(alive_heros)) {
+                        alive_heros[0].act_state = 1;
+                    }
+                }
+
             }
         }
     },

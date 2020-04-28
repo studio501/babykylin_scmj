@@ -6,6 +6,7 @@ var tokenMgr = require('./tokenmgr');
 var roomMgr = require('./roommgr');
 var userMgr = require('./usermgr');
 var http = require('../utils/http');
+var table = require('../utils/table');
 var io = null;
 
 var app = express();
@@ -142,16 +143,19 @@ exports.start = function (conf, mgr) {
 					userMgr.sendMsg(userId, 'dissolve_notice_push', data);
 				}
 			}
-
-			db.get_user_data_by_userid(userId, function (user_db_data) {
-				var bind_hero_id = user_db_data.bindhero;
-				db.get_hero_data(bind_hero_id, null, function (bindhero) {
-					bindhero.isBind = 1;
-					roomInfo.seats[seatIndex].heros = [bindhero];
-					userData.heros = roomInfo.seats[seatIndex].heros;
-					fn();
+			if (table.isEmpty(userData.heros)) {
+				db.get_user_data_by_userid(userId, function (user_db_data) {
+					var bind_hero_id = user_db_data.bindhero;
+					db.get_hero_data(bind_hero_id, null, function (bindhero) {
+						bindhero.isBind = 1;
+						roomInfo.seats[seatIndex].heros = [bindhero];
+						userData.heros = roomInfo.seats[seatIndex].heros;
+						fn();
+					})
 				})
-			})
+			} else {
+				fn();
+			}
 		});
 
 		socket.on('battleReady', function () {

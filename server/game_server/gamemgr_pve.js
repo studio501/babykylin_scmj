@@ -263,7 +263,7 @@ exports.setReady = function (userId) {
         }
 
 
-        gameutils.initActHeroOrder(data.seats,false,0);
+        gameutils.initActHeroOrder(data.seats, false, 0);
         // var actInfo = null;
         // if (hero_sortby_spd && gameutils.tell_hero_group(data.seats, hero_sortby_spd[0]) === 1) {
         //     actInfo = npc_act(data.seats, hero_sortby_spd[0]);
@@ -374,7 +374,7 @@ exports.begin = function (roomId) {
     games[roomId] = game;
 
     gameutils.updateRoundInitSpd(hero_arr);
-    var hero_sortby_spd = gameutils.moveToNextHero(seats,0);
+    var hero_sortby_spd = gameutils.moveToNextHero(seats, 0);
     // var actInfo = null;
     // if (hero_sortby_spd && gameutils.tell_hero_group(seats, hero_sortby_spd[0]) === 1) {
     //     actInfo = npc_act(seats, hero_sortby_spd[0]);
@@ -460,8 +460,8 @@ exports.heroAct = function (userId, actInfo) {
         var act_func = act_handler[actKey];
         if (act_func) {
             var targetHeros = gameutils.getAliveHeros(room_seats, targetIds);
-            for (var i = 0; i < targetHeros.length; i++) {
-                act_func(now_act_hero, targetHeros[i]);
+            for (var j = 0; j < targetHeros.length; j++) {
+                act_func(now_act_hero, targetHeros[j]);
             }
             var t = { actInfo: tmpInfo, heros: [trimHeroData(room_seats[0].heros), trimHeroData(room_seats[1].heros)] };
             round_data.push(t)

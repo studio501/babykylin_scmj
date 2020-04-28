@@ -137,8 +137,9 @@ cc.Class({
         let dl_dt = 0.1
         this.m_atkAct = this.node.runAction(cc.spawn(
             cc.sequence(cc.moveTo(go_dt, cc.v2(pos.x, pos.y)), cc.delayTime(dl_dt), cc.moveTo(back_dt, cc.v2(self.m_ori_p.x, self.m_ori_p.y)), cc.callFunc(function () {
+                self.m_data.act_state = 2;
                 self.idle();
-                if(cb){
+                if (cb) {
                     cb();
                 }
             })),
