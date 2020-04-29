@@ -16,10 +16,11 @@
 				"iOS",
 				"HTML5"
 			],
-			"package_download_url": "https://download.cocos.com/CocosServices/plugins/service-analytics/1.2.6_2.1.1.zip",
-			"package_version_desc": "<br />\n<strong>update：</strong> 2020/03/05<br />\n<strong>update note：</strong><br />\n1.Fixed an issue that caused the integration of Analytics to fail when checking the engine separation option in the release of WeChat games.</p>",
+			"package_download_url": "https://download.cocos.com/CocosServices/plugins/service-analytics/1.2.7_2.1.2.zip",
+			"package_version_desc": "<br />\n<strong>update：</strong> 2020/04/29<br />\n<strong>update note：</strong><br />\n1.Fixed an issue where the Creator plug-in system reported an error due to repeated clicks to reload the Yunlan plug-in.<br />\n2.Fix performance loss caused by network retry.<br />\n3.Update the cocosanalytics.d.ts syntax prompt document.<br />\n4.Update SDK version.</p>",
 			"service_component_name": "service-analytics",
 			"package_versions": [
+				"1.2.7_2.1.2",
 				"1.2.6_2.1.1",
 				"1.2.5_2.1.1",
 				"1.2.3_2.1.1",

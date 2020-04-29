@@ -39,7 +39,7 @@ CREATE TABLE `t_games` (
   `base_info` varchar(1024) NOT NULL,
   `create_time` int(11) NOT NULL,
   `snapshots` char(255) DEFAULT NULL,
-  `action_records` varchar(2048) DEFAULT NULL,
+  `action_records` text DEFAULT NULL,
   `result` char(255) DEFAULT NULL,
   PRIMARY KEY (`room_uuid`,`game_index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

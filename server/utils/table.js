@@ -91,3 +91,7 @@ exports.filterKey = function (tbl, trim_key) {
     }
     return res;
 }
+
+exports.clone = function(tbl) {
+    return JSON.parse(JSON.stringify(tbl));
+ }

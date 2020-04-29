@@ -154,26 +154,27 @@ function doGameOver(game, userId, forceEnd) {
 
 
 //只选取必要的信息存储
-function trimHeroData(heros) {
-    var res = [];
-    for (var j = 0; j < heros.length; j++) {
-        var t_hero = heros[j];
-        res.push({
-            id: t_hero.id,
-            uuid: t_hero.uuid,
-            name: t_hero.name,
-            curhp: t_hero.curhp,
-            mp: t_hero.mp,
-            curmp: t_hero.curmp,
-            lv: t_hero.lv,
-            act_state: t_hero.act_state,
-        })
-    }
-    return res;
+function trimHeroActData(heros) {
+    return table.trimTbl(heros,["id","uuid","curhp","curmp","act_state"]);
+    // var res = [];
+    // for (var j = 0; j < heros.length; j++) {
+    //     var t_hero = heros[j];
+    //     res.push({
+    //         id: t_hero.id,
+    //         uuid: t_hero.uuid,
+    //         name: t_hero.name,
+    //         curhp: t_hero.curhp,
+    //         mp: t_hero.mp,
+    //         curmp: t_hero.curmp,
+    //         lv: t_hero.lv,
+    //         act_state: t_hero.act_state,
+    //     })
+    // }
+    // return res;
 }
 
 function recordGameAction(game, action) {
-    game.actionList.push(action);
+    game.actionList.acts.push(action);
 }
 
 function sendActResult(seats, round_data, game_over_data) {
@@ -190,8 +191,8 @@ function gen_npc() {
         id: "33",
         uuid: "33xxvcae",
         name: "打手",
-        hp: 30,
-        curhp: 30,
+        hp: 230,
+        curhp: 230,
         mp: 4,
         curmp: 4,
         atk: 10,
@@ -351,7 +352,7 @@ exports.begin = function (roomId) {
 
         currentIndex: 0,
         gameSeats: new Array(GameSeatNum),
-        actionList: []
+        actionList: {init:{},acts:[]}
     };
 
     roomInfo.numOfGames++;
@@ -375,6 +376,7 @@ exports.begin = function (roomId) {
 
     gameutils.updateRoundInitSpd(hero_arr);
     var hero_sortby_spd = gameutils.moveToNextHero(seats, 0);
+    game.actionList.init = table.clone(hero_arr);
     // var actInfo = null;
     // if (hero_sortby_spd && gameutils.tell_hero_group(seats, hero_sortby_spd[0]) === 1) {
     //     actInfo = npc_act(seats, hero_sortby_spd[0]);
@@ -463,7 +465,7 @@ exports.heroAct = function (userId, actInfo) {
             for (var j = 0; j < targetHeros.length; j++) {
                 act_func(now_act_hero, targetHeros[j]);
             }
-            var t = { actInfo: tmpInfo, heros: [trimHeroData(room_seats[0].heros), trimHeroData(room_seats[1].heros)] };
+            var t = { actInfo: tmpInfo, heros: [trimHeroActData(room_seats[0].heros), trimHeroActData(room_seats[1].heros)] };
             round_data.push(t)
             recordGameAction(game, t);
         }
