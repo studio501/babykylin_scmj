@@ -195,7 +195,7 @@ function gen_npc() {
         curhp: 230,
         mp: 4,
         curmp: 4,
-        atk: 10,
+        atk: 80,
         def: 10,
         spd: 2,
         lv: 1,
