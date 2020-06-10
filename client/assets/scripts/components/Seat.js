@@ -4,6 +4,15 @@ import { handler, gen_handler } from "../base/util";
 
 const table = require("../table");
 
+const hero_positions = [
+    {origin_p:cc.v2(0,0),delta_p:cc.v2(0,0)},
+    {origin_p:cc.v2(0,100),delta_p:cc.v2(0,-260)},
+    {origin_p:cc.v2(0,110),delta_p:cc.v2(0,-260)},
+    {origin_p:cc.v2(0,110),delta_p:cc.v2(0,-260)},
+    {origin_p:cc.v2(0,110),delta_p:cc.v2(0,-260)},
+    {origin_p:cc.v2(0,1100),delta_p:cc.v2(0,-260)}
+];
+
 cc.Class({
     extends: cc.Component,
 
@@ -257,9 +266,12 @@ cc.Class({
     _setHero: function (index, herodata) {
         let self = this;
         let hero_ins = this._heroArr[index];
+        let hero_position_cfg = hero_positions[index];
         let fn = function (ins) {
             ins.getComponent('hero').setData(herodata);
             ins.getComponent('hero').setDirection(self._isMyself);
+            ins.x = hero_position_cfg.origin_p.x;
+            ins.y = hero_position_cfg.origin_p.y + index * hero_position_cfg.delta_p.y;
         };
 
         if (hero_ins) {

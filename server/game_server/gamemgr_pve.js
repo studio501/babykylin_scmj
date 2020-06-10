@@ -8,6 +8,8 @@ var table = require("../utils/table");
 var crypto = require("../utils/crypto");
 var games = {};
 var gamesIdBase = 0;
+var gameconst = require('./gameconst');
+var Hero_Act_State = gameconst.Hero_Act_State;
 
 var gameSeatsOfUsers = {};
 
@@ -186,16 +188,17 @@ function sendActResult(seats, round_data, game_over_data) {
 }
 
 
-function gen_npc() {
+function gen_npc(index) {
+    let id_str = (33+index).toString();
     return {
-        id: "33",
+        id: id_str,
         uuid: "33xxvcae",
         name: "打手",
         hp: 230,
         curhp: 230,
         mp: 4,
         curmp: 4,
-        atk: 80,
+        atk: 30,
         def: 10,
         spd: 2,
         lv: 1,
@@ -230,8 +233,8 @@ exports.setReady = function (userId) {
     if (game == null) {
         if (roomInfo.seats.length == GameSeatNum) {
             var npcs = [];
-            for (var i = 0; i < 1; i++) {
-                npcs.push(gen_npc());
+            for (var i = 0; i < 2; i++) {
+                npcs.push(gen_npc(i));
             }
             roomInfo.seats[1].heros = npcs;
             exports.begin(roomId);
@@ -257,14 +260,12 @@ exports.setReady = function (userId) {
             if (sd.userId == userId) {
                 seatData = sd;
             }
-            else {
-                s.huanpais = sd.huanpais ? [] : null;
-            }
             data.seats.push(s);
         }
 
 
         gameutils.initActHeroOrder(data.seats, false, 0);
+        data.seats[0].heros[0].act_state = Hero_Act_State.Acting
         // var actInfo = null;
         // if (hero_sortby_spd && gameutils.tell_hero_group(data.seats, hero_sortby_spd[0]) === 1) {
         //     actInfo = npc_act(data.seats, hero_sortby_spd[0]);

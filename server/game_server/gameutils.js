@@ -161,7 +161,7 @@ exports.tell_hero_group = function (seats, hero) {
     }
 
     for (var i = 0; i < seats.length; i++) {
-        for (var j = 0; j < seats[i].heros.length; i++) {
+        for (var j = 0; j < seats[i].heros.length; j++) {
             if (seats[i].heros[j] === hero) {
                 return i;
             }
